@@ -1,0 +1,153 @@
+/* ============================================
+   Properties Panel — Edit selected node
+   ============================================ */
+
+const Properties = (() => {
+  let panelEl = null;
+  let currentNodeId = null;
+
+  function init() {
+    panelEl = document.getElementById('properties-panel');
+  }
+
+  /**
+   * Show properties for a node
+   */
+  function show(nodeId) {
+    const node = State.getNodeById(nodeId);
+    if (!node) return;
+
+    currentNodeId = nodeId;
+
+    const colorSwatches = NODE_COLORS.map(c =>
+      `<div class="props-color-swatch ${c.value === node.color ? 'active' : ''}" 
+            style="background:${c.value}" data-color="${c.value}"
+            title="${c.name}"></div>`
+    ).join('');
+
+    const statusOptions = STATUSES.map(s =>
+      `<div class="props-status-option ${s.key === node.status ? 'active' : ''}" data-status="${s.key || ''}">
+        <span class="props-status-dot" style="background:${s.color}"></span>
+        ${s.label}
+      </div>`
+    ).join('');
+
+    panelEl.innerHTML = `
+      <div class="props-header">
+        <h3>${node.type === 'group' ? 'Group' : 'Node'} Properties</h3>
+        <button class="props-close-btn" id="props-close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="props-body">
+        <div class="props-field">
+          <label>Label</label>
+          <input type="text" id="props-label" value="${escapeAttr(node.label)}" placeholder="Node label">
+        </div>
+        <div class="props-field">
+          <label>Description</label>
+          <textarea id="props-description" placeholder="Add notes or description...">${escapeAttr(node.description || '')}</textarea>
+        </div>
+        <div class="props-field">
+          <label>Color</label>
+          <div class="props-color-grid" id="props-colors">${colorSwatches}</div>
+        </div>
+        <div class="props-field">
+          <label>Status</label>
+          <div class="props-status-list" id="props-statuses">${statusOptions}</div>
+        </div>
+        <button class="props-delete-btn" id="props-delete">Delete ${node.type === 'group' ? 'Group' : 'Node'}</button>
+      </div>
+    `;
+
+    panelEl.classList.add('visible');
+    bindEvents();
+  }
+
+  /**
+   * Hide properties panel
+   */
+  function hide() {
+    panelEl.classList.remove('visible');
+    currentNodeId = null;
+  }
+
+  /**
+   * Bind input events
+   */
+  function bindEvents() {
+    // Close
+    document.getElementById('props-close').addEventListener('click', hide);
+
+    // Label
+    const labelInput = document.getElementById('props-label');
+    labelInput.addEventListener('input', () => {
+      if (currentNodeId) {
+        State.updateNode(currentNodeId, { label: labelInput.value });
+        const node = State.getNodeById(currentNodeId);
+        if (node) NodeRenderer.renderNode(node);
+      }
+    });
+
+    // Description
+    const descInput = document.getElementById('props-description');
+    descInput.addEventListener('input', () => {
+      if (currentNodeId) {
+        State.updateNode(currentNodeId, { description: descInput.value });
+      }
+    });
+
+    // Colors
+    document.getElementById('props-colors').addEventListener('click', (e) => {
+      const swatch = e.target.closest('.props-color-swatch');
+      if (swatch && currentNodeId) {
+        const color = swatch.dataset.color;
+        State.updateNode(currentNodeId, { color });
+        const node = State.getNodeById(currentNodeId);
+        if (node) {
+          NodeRenderer.renderNode(node);
+          ConnectionRenderer.renderAll();
+        }
+        // Update active state
+        document.querySelectorAll('.props-color-swatch').forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+      }
+    });
+
+    // Status
+    document.getElementById('props-statuses').addEventListener('click', (e) => {
+      const option = e.target.closest('.props-status-option');
+      if (option && currentNodeId) {
+        const status = option.dataset.status || null;
+        State.updateNode(currentNodeId, { status });
+        const node = State.getNodeById(currentNodeId);
+        if (node) NodeRenderer.renderNode(node);
+        // Update active state
+        document.querySelectorAll('.props-status-option').forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+      }
+    });
+
+    // Delete
+    document.getElementById('props-delete').addEventListener('click', () => {
+      if (currentNodeId) {
+        State.deleteNode(currentNodeId);
+        Selection.clearSelection();
+        NodeRenderer.renderAll();
+        ConnectionRenderer.renderAll();
+        hide();
+      }
+    });
+
+    // Prevent canvas interactions when using panel
+    panelEl.addEventListener('mousedown', (e) => e.stopPropagation());
+  }
+
+  function escapeAttr(str) {
+    return str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  return { init, show, hide, get currentNodeId() { return currentNodeId; } };
+})();

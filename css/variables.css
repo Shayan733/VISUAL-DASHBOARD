@@ -1,0 +1,109 @@
+/* ============================================
+   VISUAL DASHBOARD — Design Tokens
+   Theme: "Deep Space" 🌌
+   ============================================ */
+
+:root {
+  /* ── Canvas ── */
+  --canvas-bg: #0c0c14;
+  --grid-dot: rgba(255, 255, 255, 0.04);
+  --grid-dot-major: rgba(255, 255, 255, 0.08);
+  --grid-size: 20px;
+
+  /* ── Surfaces ── */
+  --surface-1: #13131f;
+  --surface-2: #1a1a2e;
+  --surface-3: #222238;
+  --surface-4: #2a2a44;
+
+  /* ── Borders ── */
+  --border: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --border-selected: #6366f1;
+  --border-connecting: #818cf8;
+
+  /* ── Text ── */
+  --text-1: #f1f5f9;
+  --text-2: #94a3b8;
+  --text-3: #475569;
+  --text-placeholder: #334155;
+
+  /* ── Accent / Primary ── */
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-glow: rgba(129, 140, 248, 0.2);
+  --accent-glow-strong: rgba(129, 140, 248, 0.4);
+
+  /* ── Node Color Palette ── */
+  --color-indigo: #818cf8;
+  --color-violet: #a78bfa;
+  --color-emerald: #34d399;
+  --color-amber: #fbbf24;
+  --color-rose: #fb7185;
+  --color-cyan: #22d3ee;
+  --color-orange: #fb923c;
+  --color-slate: #64748b;
+
+  /* ── Status Colors ── */
+  --status-todo: #94a3b8;
+  --status-progress: #fb923c;
+  --status-done: #34d399;
+  --status-blocked: #fb7185;
+
+  /* ── Danger ── */
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+  --shadow-node: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
+  --shadow-node-hover: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-hover);
+  --shadow-node-selected: 0 0 0 2px var(--border-selected), 0 0 20px var(--accent-glow);
+  --shadow-node-dragging: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--border-selected);
+
+  /* ── Spacing ── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* ── Radii ── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Typography ── */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ── Transitions ── */
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 350ms ease;
+
+  /* ── Z-Index Layers ── */
+  --z-grid: 0;
+  --z-connections: 10;
+  --z-groups: 20;
+  --z-nodes: 30;
+  --z-dragging: 100;
+  --z-toolbar: 500;
+  --z-context-menu: 600;
+  --z-properties: 550;
+  --z-modal: 700;
+}

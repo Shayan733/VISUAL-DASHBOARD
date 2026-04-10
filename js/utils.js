@@ -1,0 +1,238 @@
+/* ============================================
+   Utility Functions
+   ============================================ */
+
+/**
+ * Generate a unique ID with optional prefix
+ */
+function generateId(prefix = 'id') {
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 6)}`;
+}
+
+/**
+ * Clamp a value between min and max
+ */
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Linear interpolation
+ */
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+/**
+ * Distance between two points
+ */
+function distance(x1, y1, x2, y2) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+/**
+ * Check if a point is inside a rectangle
+ */
+function pointInRect(px, py, rx, ry, rw, rh) {
+  return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+}
+
+/**
+ * Check if two rectangles overlap
+ */
+function rectsOverlap(r1, r2) {
+  return !(
+    r1.x + r1.width < r2.x ||
+    r2.x + r2.width < r1.x ||
+    r1.y + r1.height < r2.y ||
+    r2.y + r2.height < r1.y
+  );
+}
+
+/**
+ * Get bounding rect of multiple items (nodes/groups)
+ */
+function getBoundingRect(items) {
+  if (items.length === 0) return { x: 0, y: 0, width: 0, height: 0 };
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+  for (const item of items) {
+    minX = Math.min(minX, item.x);
+    minY = Math.min(minY, item.y);
+    maxX = Math.max(maxX, item.x + (item.width || 180));
+    maxY = Math.max(maxY, item.y + (item.height || 60));
+  }
+
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+
+/**
+ * Generate a cubic bezier path between two points
+ * with smart curvature based on relative positions
+ */
+function generateBezierPath(x1, y1, x2, y2, sourcePort, targetPort) {
+  const dx = Math.abs(x2 - x1);
+  const dy = Math.abs(y2 - y1);
+  const curvature = Math.min(Math.max(dx * 0.4, 50), 200);
+
+  let cx1, cy1, cx2, cy2;
+
+  // Determine control points based on port directions
+  switch (sourcePort) {
+    case 'right':
+      cx1 = x1 + curvature;
+      cy1 = y1;
+      break;
+    case 'left':
+      cx1 = x1 - curvature;
+      cy1 = y1;
+      break;
+    case 'bottom':
+      cx1 = x1;
+      cy1 = y1 + curvature;
+      break;
+    case 'top':
+      cx1 = x1;
+      cy1 = y1 - curvature;
+      break;
+    default:
+      cx1 = x1 + curvature;
+      cy1 = y1;
+  }
+
+  switch (targetPort) {
+    case 'left':
+      cx2 = x2 - curvature;
+      cy2 = y2;
+      break;
+    case 'right':
+      cx2 = x2 + curvature;
+      cy2 = y2;
+      break;
+    case 'top':
+      cx2 = x2;
+      cy2 = y2 - curvature;
+      break;
+    case 'bottom':
+      cx2 = x2;
+      cy2 = y2 + curvature;
+      break;
+    default:
+      cx2 = x2 - curvature;
+      cy2 = y2;
+  }
+
+  return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+}
+
+/**
+ * Get the port position (x, y) for a node given the port direction
+ */
+function getPortPosition(node, port) {
+  const x = node.x;
+  const y = node.y;
+  const w = node.width || 180;
+  const h = node.height || 60;
+
+  switch (port) {
+    case 'top':    return { x: x + w / 2, y: y };
+    case 'right':  return { x: x + w, y: y + h / 2 };
+    case 'bottom': return { x: x + w / 2, y: y + h };
+    case 'left':   return { x: x, y: y + h / 2 };
+    default:       return { x: x + w / 2, y: y + h / 2 };
+  }
+}
+
+/**
+ * Find the closest port on a node to a given point
+ */
+function findClosestPort(node, px, py) {
+  const ports = ['top', 'right', 'bottom', 'left'];
+  let closest = 'right';
+  let minDist = Infinity;
+
+  for (const port of ports) {
+    const pos = getPortPosition(node, port);
+    const d = distance(px, py, pos.x, pos.y);
+    if (d < minDist) {
+      minDist = d;
+      closest = port;
+    }
+  }
+
+  return closest;
+}
+
+/**
+ * Debounce a function
+ */
+function debounce(fn, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+/**
+ * Throttle a function
+ */
+function throttle(fn, limit) {
+  let inThrottle;
+  return function (...args) {
+    if (!inThrottle) {
+      fn.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}
+
+/**
+ * Deep clone an object (JSON-safe)
+ */
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+/**
+ * Snap value to grid
+ */
+function snapToGrid(value, gridSize = 20) {
+  return Math.round(value / gridSize) * gridSize;
+}
+
+/**
+ * Available node colors
+ */
+const NODE_COLORS = [
+  { name: 'Indigo',  value: '#818cf8' },
+  { name: 'Violet',  value: '#a78bfa' },
+  { name: 'Emerald', value: '#34d399' },
+  { name: 'Amber',   value: '#fbbf24' },
+  { name: 'Rose',    value: '#fb7185' },
+  { name: 'Cyan',    value: '#22d3ee' },
+  { name: 'Orange',  value: '#fb923c' },
+  { name: 'Slate',   value: '#64748b' },
+];
+
+/**
+ * Status definitions
+ */
+const STATUSES = [
+  { key: null,        label: 'None',        color: 'transparent', icon: '' },
+  { key: 'todo',      label: 'Todo',        color: '#94a3b8',     icon: '○' },
+  { key: 'progress',  label: 'In Progress', color: '#fb923c',     icon: '◐' },
+  { key: 'done',      label: 'Done',        color: '#34d399',     icon: '●' },
+  { key: 'blocked',   label: 'Blocked',     color: '#fb7185',     icon: '✕' },
+];
+
+/**
+ * Get next status in cycle
+ */
+function cycleStatus(currentStatus) {
+  const idx = STATUSES.findIndex(s => s.key === currentStatus);
+  const nextIdx = (idx + 1) % STATUSES.length;
+  return STATUSES[nextIdx].key;
+}

@@ -1,0 +1,106 @@
+/* ============================================
+   Connections — SVG bezier curves, arrows
+   ============================================ */
+
+/* ── Base Connection Path ── */
+.connection-path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  cursor: pointer;
+  transition: stroke var(--transition-fast), stroke-width var(--transition-fast);
+}
+
+.connection-path:hover {
+  stroke-width: 3;
+  filter: drop-shadow(0 0 4px var(--accent-glow-strong));
+}
+
+.connection-path.selected {
+  stroke-width: 3;
+  stroke: var(--border-selected);
+  filter: drop-shadow(0 0 6px var(--accent-glow-strong));
+}
+
+/* ── Hit Area (invisible wider path for easier clicking) ── */
+.connection-hit-area {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+/* ── Animated Flow Dots ── */
+.connection-flow {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 2;
+  stroke-dasharray: 4, 12;
+  stroke-linecap: round;
+  pointer-events: none;
+  animation: flowAnimation 1.5s linear infinite;
+}
+
+@keyframes flowAnimation {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+/* ── Arrow Head Marker ── */
+.connection-arrow {
+  fill: var(--accent);
+  transition: fill var(--transition-fast);
+}
+
+/* ── Connection Label ── */
+.connection-label-group {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.connection-label-bg {
+  fill: var(--surface-3);
+  rx: 4;
+  ry: 4;
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.connection-label-text {
+  fill: var(--text-2);
+  font-size: 11px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* ── Connection Preview (while creating) ── */
+.connection-preview-path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 6, 4;
+  stroke-linecap: round;
+  pointer-events: none;
+  animation: dashFlow 0.5s linear infinite;
+}
+
+/* ── Port Glow Effect during connection ── */
+.port-glow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  opacity: 0;
+  pointer-events: none;
+  animation: portGlowPulse 1s ease-in-out infinite;
+}
+
+@keyframes portGlowPulse {
+  0%, 100% { opacity: 0; r: 8; }
+  50% { opacity: 0.5; r: 14; }
+}

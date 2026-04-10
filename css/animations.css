@@ -1,0 +1,132 @@
+/* ============================================
+   Micro-animations & Transitions
+   ============================================ */
+
+/* ── Node enter animation ── */
+@keyframes nodeEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.canvas-node.entering {
+  animation: nodeEnter 0.25s ease-out forwards;
+}
+
+/* ── Node delete animation ── */
+@keyframes nodeExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.canvas-node.exiting {
+  animation: nodeExit 0.2s ease-in forwards;
+  pointer-events: none;
+}
+
+/* ── Selection pulse ── */
+@keyframes selectionPulse {
+  0%, 100% { box-shadow: var(--shadow-node-selected); }
+  50% { box-shadow: 0 0 0 2px var(--border-selected), 0 0 30px var(--accent-glow-strong); }
+}
+
+.canvas-node.selected {
+  animation: selectionPulse 2s ease-in-out infinite;
+}
+
+.canvas-node.selected.dragging {
+  animation: none;
+}
+
+/* ── Connection enter ── */
+@keyframes connectionEnter {
+  from {
+    stroke-dasharray: 0, 1000;
+    opacity: 0;
+  }
+  to {
+    stroke-dasharray: 1000, 0;
+    opacity: 1;
+  }
+}
+
+.connection-path.entering {
+  animation: connectionEnter 0.4s ease-out forwards;
+}
+
+/* ── Toolbar tooltip fade ── */
+@keyframes tooltipFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Save indicator flash ── */
+@keyframes saveFlash {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+#save-indicator {
+  position: fixed;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--status-done);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  z-index: var(--z-modal);
+  pointer-events: none;
+  animation: saveFlash 1.5s ease forwards;
+}
+
+/* ── Context menu appear ── */
+@keyframes menuAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Properties panel slide ── */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

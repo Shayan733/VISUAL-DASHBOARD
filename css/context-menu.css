@@ -1,0 +1,106 @@
+/* ============================================
+   Context Menu Styling
+   ============================================ */
+
+#context-menu {
+  position: fixed;
+  min-width: 200px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-context-menu);
+  padding: var(--space-xs) 0;
+  display: none;
+  animation: menuAppear 0.15s ease-out;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+#context-menu.visible {
+  display: block;
+}
+
+/* ── Menu Items ── */
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ctx-item:hover {
+  background: var(--surface-4);
+  color: var(--text-1);
+}
+
+.ctx-item.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.ctx-item svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.ctx-item:hover svg {
+  opacity: 1;
+}
+
+.ctx-shortcut {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  color: var(--text-3);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ── Separator ── */
+.ctx-separator {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-xs) 0;
+}
+
+/* ── Submenu Header ── */
+.ctx-header {
+  padding: var(--space-xs) var(--space-lg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Color Picker Row ── */
+.ctx-color-row {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.ctx-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.ctx-color-swatch:hover {
+  transform: scale(1.2);
+  border-color: var(--text-1);
+}
+
+.ctx-color-swatch.active {
+  border-color: var(--text-1);
+  box-shadow: 0 0 8px var(--accent-glow);
+}

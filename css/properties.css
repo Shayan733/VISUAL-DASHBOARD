@@ -1,0 +1,188 @@
+/* ============================================
+   Properties Panel Styling (Right Sidebar)
+   ============================================ */
+
+#properties-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100%;
+  background: var(--surface-2);
+  border-left: 1px solid var(--border);
+  z-index: var(--z-properties);
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideInRight 0.25s ease-out;
+}
+
+#properties-panel.visible {
+  display: flex;
+}
+
+/* ── Panel Header ── */
+.props-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.props-header h3 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.props-close-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-3);
+  transition: all var(--transition-fast);
+}
+
+.props-close-btn:hover {
+  background: var(--surface-4);
+  color: var(--text-1);
+}
+
+/* ── Panel Body ── */
+.props-body {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ── Field Group ── */
+.props-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.props-field label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.props-field input[type="text"],
+.props-field textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-1);
+  transition: border-color var(--transition-fast);
+}
+
+.props-field input[type="text"]:focus,
+.props-field textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.props-field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.props-field input::placeholder,
+.props-field textarea::placeholder {
+  color: var(--text-3);
+}
+
+/* ── Color Picker ── */
+.props-color-grid {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.props-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.props-color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.props-color-swatch.active {
+  border-color: var(--text-1);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* ── Status Picker ── */
+.props-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.props-status-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-2);
+  transition: all var(--transition-fast);
+}
+
+.props-status-option:hover {
+  background: var(--surface-3);
+  color: var(--text-1);
+}
+
+.props-status-option.active {
+  background: var(--surface-4);
+  color: var(--text-1);
+}
+
+.props-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* ── Delete Button ── */
+.props-delete-btn {
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--danger);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.props-delete-btn:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}

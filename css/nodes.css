@@ -1,0 +1,231 @@
+/* ============================================
+   Node Cards Styling
+   ============================================ */
+
+/* ── Base Node ── */
+.canvas-node {
+  position: absolute;
+  min-width: 160px;
+  min-height: 52px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-node);
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.canvas-node:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-node-hover);
+}
+
+.canvas-node.selected {
+  border-color: var(--border-selected);
+  box-shadow: var(--shadow-node-selected);
+}
+
+.canvas-node.dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-node-dragging);
+  opacity: 0.95;
+  z-index: var(--z-dragging) !important;
+}
+
+/* ── Color Accent Strip ── */
+.node-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  transition: background-color var(--transition-normal);
+}
+
+/* ── Node Header ── */
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  padding-top: calc(var(--space-md) + 3px); /* account for accent strip */
+  min-height: 44px;
+}
+
+.node-status-badge {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+  border: 1.5px solid var(--border);
+}
+
+.node-status-badge:hover {
+  transform: scale(1.2);
+}
+
+.node-label {
+  flex: 1;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.node-label[contenteditable="true"] {
+  outline: none;
+  cursor: text;
+  white-space: pre;
+  overflow: visible;
+  background: var(--surface-3);
+  border-radius: var(--radius-sm);
+  padding: 1px 4px;
+  margin: -1px -4px;
+}
+
+/* ── Node Description (expanded) ── */
+.node-description {
+  padding: 0 var(--space-lg) var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-2);
+  line-height: 1.5;
+  display: none;
+}
+
+.canvas-node.expanded .node-description {
+  display: block;
+}
+
+.node-description textarea {
+  width: 100%;
+  min-height: 40px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-2);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.node-description textarea:focus {
+  border-color: var(--accent);
+}
+
+.node-description textarea::placeholder {
+  color: var(--text-3);
+}
+
+/* ── Connection Ports ── */
+.node-port {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  border: 2px solid var(--border-hover);
+  cursor: crosshair;
+  z-index: 5;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
+  opacity: 0;
+}
+
+.canvas-node:hover .node-port,
+.canvas-node.selected .node-port,
+.canvas-node.connecting .node-port {
+  opacity: 1;
+}
+
+.node-port:hover {
+  transform: scale(1.4);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.node-port.port-top {
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.node-port.port-right {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.node-port.port-bottom {
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.node-port.port-left {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.node-port.port-top:hover { transform: translateX(-50%) scale(1.4); }
+.node-port.port-right:hover { transform: translateY(-50%) scale(1.4); }
+.node-port.port-bottom:hover { transform: translateX(-50%) scale(1.4); }
+.node-port.port-left:hover { transform: translateY(-50%) scale(1.4); }
+
+/* Connected port indicator */
+.node-port.connected {
+  opacity: 1;
+  background: var(--accent);
+  border-color: var(--accent);
+  width: 10px;
+  height: 10px;
+}
+
+.node-port.connected.port-top { top: -5px; }
+.node-port.connected.port-right { right: -5px; }
+.node-port.connected.port-bottom { bottom: -5px; }
+.node-port.connected.port-left { left: -5px; }
+
+/* ── Resize Handle ── */
+.node-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.canvas-node:hover .node-resize-handle,
+.canvas-node.selected .node-resize-handle {
+  opacity: 0.5;
+}
+
+.node-resize-handle::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-3);
+  border-bottom: 2px solid var(--text-3);
+  border-radius: 0 0 2px 0;
+}
