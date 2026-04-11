@@ -15,6 +15,7 @@ const App = (() => {
     ContextMenu.init();
     Properties.init();
     Keyboard.init();
+    Minimap.init();
 
     // Listen for state changes
     State.on(onStateChange);
