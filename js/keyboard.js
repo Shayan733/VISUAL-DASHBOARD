@@ -74,13 +74,15 @@ const Keyboard = (() => {
       return;
     }
 
-    // ── Escape — Deselect / Close ──
+    // ── Escape — Deselect / Close / Cancel link mode ──
     if (e.key === 'Escape') {
       Selection.clearSelection();
       ConnectionRenderer.deselectAll();
       ConnectionRenderer.renderAll();
       ContextMenu.close();
+      ContextMenu.cancelLinkMode();
       Properties.hide();
+      CommandPalette.close();
       return;
     }
   }

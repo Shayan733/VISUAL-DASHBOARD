@@ -10,15 +10,37 @@ const ConnectionRenderer = (() => {
    */
   function renderAll() {
     const svg = Canvas.connectionsLayer;
-    // Remove existing connections (keep defs and preview)
     svg.querySelectorAll('.connection-group').forEach(g => g.remove());
+    svg.querySelectorAll('.note-link-line').forEach(l => l.remove());
 
-    const connections = State.getConnections();
-
-    // Ensure arrow marker exists
     ensureArrowMarker(svg);
 
-    connections.forEach(conn => renderConnection(conn, svg));
+    State.getConnections().forEach(conn => renderConnection(conn, svg));
+    renderNoteLinkLines(svg);
+  }
+
+  function renderNoteLinkLines(svg) {
+    // Draw a dashed anchor line from a sticky note to its linked regular node
+    State.getNodes()
+      .filter(n => n.type === 'sticky' && n.parentId)
+      .forEach(note => {
+        const parent = State.getNodeById(note.parentId);
+        // Only draw line when linked to a regular node (not a group)
+        if (!parent || parent.type !== 'node') return;
+
+        const np  = State.getAbsolutePosition(note.id);
+        const lp  = State.getAbsolutePosition(note.parentId);
+        const x1  = np.x + (note.width || 180) / 2;
+        const y1  = np.y + (note.height || 100) / 2;
+        const x2  = lp.x + (parent.width || 200) / 2;
+        const y2  = lp.y + (parent.height || 52) / 2;
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.classList.add('note-link-line');
+        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+        svg.appendChild(line);
+      });
   }
 
   /**
@@ -77,6 +99,9 @@ const ConnectionRenderer = (() => {
       group.appendChild(flow);
     }
 
+    // Append to SVG now so text measurement works below
+    svg.appendChild(group);
+
     // Label (if any)
     if (conn.label) {
       const midX = (sourcePortPos.x + targetPortPos.x) / 2;
@@ -85,25 +110,26 @@ const ConnectionRenderer = (() => {
       const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       labelGroup.classList.add('connection-label-group');
 
+      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bgRect.classList.add('connection-label-bg');
+      bgRect.setAttribute('y', midY - 10);
+      bgRect.setAttribute('height', 20);
+      labelGroup.appendChild(bgRect);
+
       const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       textEl.classList.add('connection-label-text');
       textEl.setAttribute('x', midX);
       textEl.setAttribute('y', midY);
       textEl.textContent = conn.label;
-      
-      // Measure text for background
       labelGroup.appendChild(textEl);
 
-      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      bgRect.classList.add('connection-label-bg');
-      // We'll position it after measuring text
-      bgRect.setAttribute('x', midX - 30);
-      bgRect.setAttribute('y', midY - 10);
-      bgRect.setAttribute('width', 60);
-      bgRect.setAttribute('height', 20);
-
-      labelGroup.insertBefore(bgRect, textEl);
       group.appendChild(labelGroup);
+
+      // Measure text now that it's in the live DOM, then size the background
+      const pad = 8;
+      const textWidth = textEl.getComputedTextLength();
+      bgRect.setAttribute('x', midX - textWidth / 2 - pad);
+      bgRect.setAttribute('width', textWidth + pad * 2);
     }
 
     // Event listeners
@@ -116,8 +142,6 @@ const ConnectionRenderer = (() => {
       e.stopPropagation();
       editConnectionLabel(conn);
     });
-
-    svg.appendChild(group);
   }
 
   /**

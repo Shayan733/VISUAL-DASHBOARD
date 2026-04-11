@@ -4,7 +4,9 @@
 
 const ContextMenu = (() => {
   let menuEl = null;
-  let currentTarget = null; // { type: 'canvas' | 'node' | 'group' | 'connection', id?: string, x: number, y: number }
+  let currentTarget = null; // { type: 'canvas' | 'node' | 'group' | 'connection' | 'sticky', id?: string, x: number, y: number }
+  let linkingNoteId = null;  // set when "Link to Node" left-click mode is active
+  let linkPickHandler = null; // stored so we can remove it on cancel
 
   function init() {
     menuEl = document.getElementById('context-menu');
@@ -29,11 +31,16 @@ const ContextMenu = (() => {
     const nodeEl = target.closest('.canvas-node');
     const connEl = target.closest('.connection-group');
 
+    // (link-pick mode uses a left-click handler, not right-click)
+
     if (nodeEl) {
       const nodeId = nodeEl.dataset.id;
       const node = State.getNodeById(nodeId);
       if (node) {
-        if (node.type === 'group') {
+        if (node.type === 'sticky') {
+          currentTarget = { type: 'sticky', id: nodeId, x: canvasPos.x, y: canvasPos.y };
+          showStickyMenu(e.clientX, e.clientY, node);
+        } else if (node.type === 'group') {
           currentTarget = { type: 'group', id: nodeId, x: canvasPos.x, y: canvasPos.y };
           showGroupMenu(e.clientX, e.clientY, node);
         } else {
@@ -56,6 +63,7 @@ const ContextMenu = (() => {
   }
 
   function showCanvasMenu(x, y) {
+    const toolboxHidden = !Toolbar.isVisible();
     menuEl.innerHTML = `
       <div class="ctx-item" data-action="add-node">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -64,6 +72,10 @@ const ContextMenu = (() => {
       <div class="ctx-item" data-action="add-group">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3" stroke-dasharray="4 2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         New Group Here
+      </div>
+      <div class="ctx-item" data-action="add-sticky">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><polyline points="14 2 14 8 20 8"/><path d="M20 14l-6 6h6v-6z"/></svg>
+        Add Note Here
       </div>
       <div class="ctx-separator"></div>
       <div class="ctx-item" data-action="fit-view">
@@ -75,6 +87,12 @@ const ContextMenu = (() => {
         Select All
         <span class="ctx-shortcut">⌘A</span>
       </div>
+      ${toolboxHidden ? `
+      <div class="ctx-separator"></div>
+      <div class="ctx-item" data-action="show-toolbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="4" height="18" rx="1"/><line x1="10" y1="7" x2="20" y2="7"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="17" x2="20" y2="17"/></svg>
+        Show Toolbox
+      </div>` : ''}
     `;
     show(x, y);
     bindActions();
@@ -162,6 +180,48 @@ const ContextMenu = (() => {
     bindActions();
   }
 
+  function showStickyMenu(x, y, note) {
+    // Determine link/group status from parentId
+    const parent = note.parentId ? State.getNodeById(note.parentId) : null;
+    const linkedToNode = parent && parent.type === 'node';
+    const inGroup = parent && parent.type === 'group';
+
+    let linkItem = '';
+    if (linkedToNode) {
+      linkItem = `
+        <div class="ctx-item" data-action="unlink-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Unlink from "${parent.label}"
+        </div>`;
+    } else {
+      linkItem = `
+        <div class="ctx-item" data-action="link-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Link to Node… <span class="ctx-hint">(click node)</span>
+        </div>`;
+    }
+
+    const groupItem = inGroup ? `
+      <div class="ctx-item" data-action="remove-note-from-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Remove from Group
+      </div>` : '';
+
+    menuEl.innerHTML = `
+      <div class="ctx-header">Sticky Note</div>
+      ${linkItem}
+      ${groupItem}
+      <div class="ctx-separator"></div>
+      <div class="ctx-item danger" data-action="delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Delete Note
+        <span class="ctx-shortcut">⌫</span>
+      </div>
+    `;
+    show(x, y);
+    bindActions();
+  }
+
   function showConnectionMenu(x, y) {
     menuEl.innerHTML = `
       <div class="ctx-item" data-action="edit-conn-label">
@@ -232,6 +292,87 @@ const ContextMenu = (() => {
         });
         NodeRenderer.renderNode(group);
         Selection.select(group.id);
+        break;
+      }
+
+      case 'add-sticky': {
+        const sticky = State.addNode({
+          type: 'sticky',
+          x: currentTarget.x - 90,
+          y: currentTarget.y - 50,
+          width: 180,
+          label: 'Note',
+          description: '',
+          color: '#fbbf24',
+        });
+        NodeRenderer.renderNode(sticky);
+        Selection.select(sticky.id);
+        setTimeout(() => {
+          const el = Canvas.nodesLayer.querySelector(`[data-id="${sticky.id}"]`);
+          if (el) el.querySelector('.sticky-text')?.focus();
+        }, 60);
+        break;
+      }
+
+      case 'link-note': {
+        const note = State.getNodeById(currentTarget.id);
+        if (!note) break;
+        // Enter left-click pick mode
+        linkingNoteId = note.id;
+        Canvas.container.classList.add('connecting');
+        Canvas.container.style.cursor = 'crosshair';
+
+        // Use a one-shot left-click handler to pick the target node
+        linkPickHandler = (ev) => {
+          ev.stopPropagation();
+          const el = ev.target.closest('.canvas-node');
+          if (el) {
+            const targetId = el.dataset.id;
+            const target = State.getNodeById(targetId);
+            if (target && target.type === 'node' && targetId !== linkingNoteId) {
+              // Convert sticky's current absolute position to relative to the target node
+              const noteAbsPos = State.getAbsolutePosition(linkingNoteId);
+              const targetAbsPos = State.getAbsolutePosition(targetId);
+              const relX = noteAbsPos.x - targetAbsPos.x;
+              const relY = noteAbsPos.y - targetAbsPos.y;
+              State.updateNode(linkingNoteId, { parentId: targetId, x: relX, y: relY });
+              History.push();
+              NodeRenderer.renderAll();
+              ConnectionRenderer.renderAll();
+            }
+          }
+          cancelLinkMode();
+        };
+
+        Canvas.container.addEventListener('click', linkPickHandler, { once: true });
+        break;
+      }
+
+      case 'unlink-note': {
+        const note = State.getNodeById(currentTarget.id);
+        if (note && note.parentId) {
+          const parent = State.getNodeById(note.parentId);
+          // Only unlink if it's linked to a regular node (not a group)
+          if (parent && parent.type === 'node') {
+            const absPos = State.getAbsolutePosition(note.id);
+            State.updateNode(note.id, { parentId: null, x: absPos.x, y: absPos.y });
+            History.push();
+            NodeRenderer.renderAll();
+            ConnectionRenderer.renderAll();
+          }
+        }
+        break;
+      }
+
+      case 'remove-note-from-group': {
+        const note = State.getNodeById(currentTarget.id);
+        if (note && note.parentId) {
+          const absPos = State.getAbsolutePosition(note.id);
+          State.updateNode(note.id, { parentId: null, x: absPos.x, y: absPos.y });
+          History.push();
+          NodeRenderer.renderAll();
+          ConnectionRenderer.renderAll();
+        }
         break;
       }
 
@@ -366,6 +507,11 @@ const ContextMenu = (() => {
         break;
       }
 
+      case 'show-toolbox': {
+        Toolbar.show();
+        break;
+      }
+
       case 'remove-from-group': {
         const node = State.getNodeById(currentTarget.id);
         if (node && node.parentId) {
@@ -381,5 +527,17 @@ const ContextMenu = (() => {
     }
   }
 
-  return { init, close };
+  function cancelLinkMode() {
+    if (linkingNoteId) {
+      linkingNoteId = null;
+      Canvas.container.classList.remove('connecting');
+      Canvas.container.style.cursor = '';
+      if (linkPickHandler) {
+        Canvas.container.removeEventListener('click', linkPickHandler);
+        linkPickHandler = null;
+      }
+    }
+  }
+
+  return { init, close, cancelLinkMode };
 })();

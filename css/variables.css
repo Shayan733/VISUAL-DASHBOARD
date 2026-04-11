@@ -98,7 +98,7 @@
 
   /* ── Z-Index Layers ── */
   --z-grid: 0;
-  --z-connections: 10;
+  --z-connections: 35;
   --z-groups: 20;
   --z-nodes: 30;
   --z-dragging: 100;

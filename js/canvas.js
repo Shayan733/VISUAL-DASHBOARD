@@ -179,7 +179,7 @@ const Canvas = (() => {
     if (target.closest('.canvas-node')) return false;
     if (target.closest('#minimap')) return false;
     if (target.closest('#properties-panel')) return false;
-    if (target.closest('#toolbar')) return false;
+    if (target.closest('#toolbox')) return false;
     if (target.closest('#context-menu')) return false;
     // Everything else inside the canvas container is empty canvas
     return true;

@@ -19,8 +19,10 @@ const Properties = (() => {
 
     currentNodeId = nodeId;
 
+    const isCustomColor = !NODE_COLORS.some(c => c.value === node.color);
+
     const colorSwatches = NODE_COLORS.map(c =>
-      `<div class="props-color-swatch ${c.value === node.color ? 'active' : ''}" 
+      `<div class="props-color-swatch ${c.value === node.color ? 'active' : ''}"
             style="background:${c.value}" data-color="${c.value}"
             title="${c.name}"></div>`
     ).join('');
@@ -52,7 +54,13 @@ const Properties = (() => {
         </div>
         <div class="props-field">
           <label>Color</label>
-          <div class="props-color-grid" id="props-colors">${colorSwatches}</div>
+          <div class="props-color-grid" id="props-colors">
+            ${colorSwatches}
+            <label class="props-custom-swatch ${isCustomColor ? 'active' : ''}" title="Custom colour">
+              <span class="props-custom-swatch-preview" id="props-custom-preview" style="background:${node.color}"></span>
+              <input type="color" id="props-color-wheel" value="${node.color}">
+            </label>
+          </div>
         </div>
         <div class="props-field">
           <label>Status</label>
@@ -99,7 +107,7 @@ const Properties = (() => {
       }
     });
 
-    // Colors
+    // Preset swatches
     document.getElementById('props-colors').addEventListener('click', (e) => {
       const swatch = e.target.closest('.props-color-swatch');
       if (swatch && currentNodeId) {
@@ -110,10 +118,28 @@ const Properties = (() => {
           NodeRenderer.renderNode(node);
           ConnectionRenderer.renderAll();
         }
-        // Update active state
-        document.querySelectorAll('.props-color-swatch').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.props-color-swatch, .props-custom-swatch').forEach(s => s.classList.remove('active'));
         swatch.classList.add('active');
+        document.getElementById('props-custom-preview').style.background = color;
+        document.getElementById('props-color-wheel').value = color;
       }
+    });
+
+    // Custom colour wheel
+    const colorWheel = document.getElementById('props-color-wheel');
+    colorWheel.addEventListener('input', () => {
+      if (!currentNodeId) return;
+      const color = colorWheel.value;
+      document.getElementById('props-custom-preview').style.background = color;
+      State.updateNode(currentNodeId, { color });
+      const node = State.getNodeById(currentNodeId);
+      if (node) {
+        NodeRenderer.renderNode(node);
+        ConnectionRenderer.renderAll();
+      }
+      // Clear preset active, mark custom active
+      document.querySelectorAll('.props-color-swatch').forEach(s => s.classList.remove('active'));
+      document.querySelector('.props-custom-swatch').classList.add('active');
     });
 
     // Status

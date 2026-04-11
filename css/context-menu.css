@@ -61,6 +61,13 @@
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
+.ctx-hint {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  color: var(--text-3);
+  font-style: italic;
+}
+
 /* ── Separator ── */
 .ctx-separator {
   height: 1px;

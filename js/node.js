@@ -28,8 +28,8 @@ const NodeRenderer = (() => {
       el.innerHTML = buildNodeHTML(node);
     }
 
-    // Add connection ports
-    appendPorts(el);
+    // Add connection ports (with optional labels from node data)
+    appendPorts(el, node.portLabels);
 
     // Add resize handle
     const resizeHandle = document.createElement('div');
@@ -87,14 +87,97 @@ const NodeRenderer = (() => {
 
   /**
    * Add connection port circles to a node element
+   * portLabels: { left: 'Input', right: 'Output' } — optional labels for left/right ports
    */
-  function appendPorts(el) {
+  function appendPorts(el, portLabels) {
     ['top', 'right', 'bottom', 'left'].forEach(dir => {
       const port = document.createElement('div');
       port.className = `node-port port-${dir}`;
       port.dataset.port = dir;
+
+      // Add label for left/right ports if provided
+      const label = portLabels && portLabels[dir];
+      if (label && (dir === 'left' || dir === 'right')) {
+        const span = document.createElement('span');
+        span.className = 'port-label';
+        span.textContent = label;
+        port.appendChild(span);
+      }
+
       el.appendChild(port);
     });
+  }
+
+  /**
+   * Create the DOM element for a sticky note
+   */
+  function createStickyElement(note) {
+    const el = document.createElement('div');
+    el.className = 'canvas-node sticky-node entering';
+    el.dataset.id = note.id;
+    el.dataset.type = 'sticky';
+
+    const absPos = State.getAbsolutePosition(note.id);
+    el.style.left = absPos.x + 'px';
+    el.style.top  = absPos.y + 'px';
+    el.style.width = (note.width || 180) + 'px';
+    if (note.height) el.style.minHeight = note.height + 'px';
+
+    applyStickyColor(el, note.color || '#fbbf24');
+    el.innerHTML = buildStickyHTML(note);
+
+    // All 4 ports — no labels on sticky notes
+    appendPorts(el, null);
+
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'node-resize-handle';
+    el.appendChild(resizeHandle);
+
+    setTimeout(() => el.classList.remove('entering'), 300);
+    return el;
+  }
+
+  function buildStickyHTML(note) {
+    const color = note.color || '#fbbf24';
+    return `
+      <div class="sticky-header" style="background:${hexToRgba(color, 0.3)}">
+        <svg class="sticky-icon" viewBox="0 0 16 16" fill="currentColor" width="12" height="12">
+          <path d="M2 0h10a2 2 0 0 1 2 2v9l-3 3H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm9 11h2.5L11 13.5V11z" opacity=".5"/>
+        </svg>
+        <span class="sticky-label">Note</span>
+      </div>
+      <textarea class="sticky-text" placeholder="Write a note...">${escapeHTML(note.description || '')}</textarea>
+    `;
+  }
+
+  function applyStickyColor(el, hex) {
+    el.style.background    = hexToRgba(hex, 0.12);
+    el.style.borderColor   = hexToRgba(hex, 0.45);
+    el.style.setProperty('--sticky-accent', hex);
+  }
+
+  function updateStickyElement(el, note) {
+    const absPos = State.getAbsolutePosition(note.id);
+    el.style.left  = absPos.x + 'px';
+    el.style.top   = absPos.y + 'px';
+    el.style.width = (note.width || 180) + 'px';
+    if (note.height) el.style.minHeight = note.height + 'px';
+    applyStickyColor(el, note.color || '#fbbf24');
+
+    const header = el.querySelector('.sticky-header');
+    if (header) header.style.background = hexToRgba(note.color || '#fbbf24', 0.3);
+  }
+
+  function bindStickyEvents(el, note) {
+    const textarea = el.querySelector('.sticky-text');
+    if (textarea) {
+      textarea.addEventListener('input', () => {
+        State.updateNode(note.id, { description: textarea.value });
+      });
+      textarea.addEventListener('mousedown', (e) => e.stopPropagation());
+      textarea.addEventListener('focus',     (e) => e.stopPropagation());
+      textarea.addEventListener('dblclick',  (e) => e.stopPropagation());
+    }
   }
 
   /**
@@ -105,11 +188,24 @@ const NodeRenderer = (() => {
     let el = nodesLayer.querySelector(`[data-id="${node.id}"]`);
 
     if (!el) {
-      el = createNodeElement(node);
-      nodesLayer.appendChild(el);
-      bindNodeEvents(el, node);
+      if (node.type === 'sticky') {
+        el = createStickyElement(node);
+        nodesLayer.appendChild(el);
+        bindStickyEvents(el, node);
+        updatePortStates(el, node.id);
+      } else {
+        el = createNodeElement(node);
+        nodesLayer.appendChild(el);
+        bindNodeEvents(el, node);
+        updatePortStates(el, node.id);
+      }
     } else {
-      updateNodeElement(el, node);
+      if (node.type === 'sticky') {
+        updateStickyElement(el, node);
+        updatePortStates(el, node.id);
+      } else {
+        updateNodeElement(el, node);
+      }
     }
 
     return el;
@@ -237,7 +333,9 @@ const NodeRenderer = (() => {
         const currentNode = State.getNodeById(node.id);
         if (currentNode) {
           State.updateNode(node.id, { collapsed: !currentNode.collapsed });
-          renderNode(currentNode);
+          const updatedNode = State.getNodeById(node.id);
+          renderNode(updatedNode);
+          ConnectionRenderer.renderAll();
         }
       });
     }
@@ -291,15 +389,14 @@ const NodeRenderer = (() => {
    * Render all nodes from state
    */
   function renderAll() {
-    // Clear existing
     Canvas.nodesLayer.innerHTML = '';
-
     const nodes = State.getNodes();
-
-    // Render groups first (so they're behind nodes)
+    // Groups first (behind everything)
     nodes.filter(n => n.type === 'group').forEach(n => renderNode(n));
-    // Then regular nodes
+    // Regular nodes
     nodes.filter(n => n.type === 'node').forEach(n => renderNode(n));
+    // Sticky notes on top
+    nodes.filter(n => n.type === 'sticky').forEach(n => renderNode(n));
   }
 
   /**

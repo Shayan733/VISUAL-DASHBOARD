@@ -16,6 +16,7 @@ const App = (() => {
     Properties.init();
     Keyboard.init();
     Minimap.init();
+    CommandPalette.init();
 
     // Listen for state changes
     State.on(onStateChange);
@@ -44,46 +45,14 @@ const App = (() => {
   }
 
   /**
-   * Handle double-click on empty canvas to create a node
+   * Handle double-click on empty canvas — open command palette
    */
   function onCanvasDblClick(e) {
-    // Don't create node if clicked on existing node
+    // Don't open palette if clicked on existing node
     if (e.target.closest('.canvas-node')) return;
 
     const canvasPos = Canvas.screenToCanvas(e.clientX, e.clientY);
-    const node = State.addNode({
-      x: canvasPos.x - 90,
-      y: canvasPos.y - 30,
-      label: 'New Node',
-    });
-    NodeRenderer.renderNode(node);
-    Selection.select(node.id);
-
-    // Auto-edit label
-    setTimeout(() => {
-      const el = Canvas.nodesLayer.querySelector(`[data-id="${node.id}"]`);
-      if (el) {
-        const label = el.querySelector('.node-label');
-        if (label) {
-          label.setAttribute('contenteditable', 'true');
-          label.focus();
-          const range = document.createRange();
-          range.selectNodeContents(label);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-
-          const finish = () => {
-            label.removeAttribute('contenteditable');
-            const newLabel = label.textContent.trim() || 'New Node';
-            State.updateNode(node.id, { label: newLabel });
-          };
-          label.addEventListener('blur', finish, { once: true });
-          label.addEventListener('keydown', (ke) => {
-            if (ke.key === 'Enter') { ke.preventDefault(); label.blur(); }
-          });
-        }
-      }
-    }, 50);
+    CommandPalette.open(e.clientX, e.clientY, canvasPos.x, canvasPos.y);
   }
 
   /**

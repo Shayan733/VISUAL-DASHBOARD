@@ -148,9 +148,16 @@ const Drag = (() => {
     dragStartX = e.clientX;
     dragStartY = e.clientY;
 
-    // Store start positions of all selected nodes
     const selectedIds = Selection.getSelected();
-    dragNodeStartPositions = selectedIds.map(id => {
+
+    // Only move "root" selected nodes — skip children whose parent is also selected,
+    // because moving the parent already repositions them via getAbsolutePosition.
+    const rootIds = selectedIds.filter(id => {
+      const node = State.getNodeById(id);
+      return !node || !node.parentId || !selectedIds.includes(node.parentId);
+    });
+
+    dragNodeStartPositions = rootIds.map(id => {
       const node = State.getNodeById(id);
       return { id, x: node.x, y: node.y };
     });
@@ -180,9 +187,9 @@ const Drag = (() => {
         el.style.top = absPos.y + 'px';
       }
 
-      // If this is a group, also update all child node DOM positions
+      // Update all child node DOM positions (works for groups and any node with children)
       const node = State.getNodeById(id);
-      if (node && node.type === 'group') {
+      if (node) {
         const children = State.getChildren(id);
         children.forEach(child => {
           const childEl = Canvas.nodesLayer.querySelector(`[data-id="${child.id}"]`);
@@ -220,9 +227,13 @@ const Drag = (() => {
         const node = State.getNodeById(id);
         if (!node) return;
 
-        // Don't put group inside itself or its children
+        // If this node's parent is also selected, the parent carried it —
+        // do NOT unparent it just because there's no explicit drop target.
+        const parentAlsoSelected = node.parentId && selectedIds.includes(node.parentId);
+        if (parentAlsoSelected) return;
+
         if (dropGroup && dropGroup.id !== id && node.type !== 'group') {
-          // Convert to relative position within group
+          // Dropping onto a new group — convert to relative position
           const nodeAbsPos = State.getAbsolutePosition(id);
           const groupAbsPos = State.getAbsolutePosition(dropGroup.id);
           if (node.parentId !== dropGroup.id) {
@@ -231,7 +242,7 @@ const Drag = (() => {
             State.updateNode(id, { parentId: dropGroup.id, x: relX, y: relY });
           }
         } else if (!dropGroup && node.parentId) {
-          // Dragged out of group — convert to absolute position
+          // Intentionally dragged out of its group (parent not selected)
           const absPos = State.getAbsolutePosition(id);
           State.updateNode(id, { parentId: null, x: absPos.x, y: absPos.y });
         }

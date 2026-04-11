@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="css/properties.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/minimap.css">
+  <link rel="stylesheet" href="css/commandPalette.css">
 
   <!-- Favicon -->
   <link rel="icon"
@@ -34,136 +35,92 @@
 <body>
   <div id="app">
 
-    <!-- ═══════════ TOOLBAR ═══════════ -->
-    <div id="toolbar">
-      <!-- Brand -->
-      <div class="toolbar-brand">
-        <div class="toolbar-logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
-          </svg>
+    <!-- ═══════════ FLOATING TOOLBOX ═══════════ -->
+    <div id="toolbox">
+      <!-- Drag handle + brand -->
+      <div class="toolbox-header" id="toolbox-drag-handle">
+        <div class="toolbox-brand">
+          <div class="toolbox-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+            </svg>
+          </div>
+          <span class="toolbox-title">VD</span>
         </div>
-        <span class="toolbar-title">Visual Dashboard</span>
+        <button class="toolbox-close-btn" id="toolbox-close" title="Close toolbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
-      <!-- Add Buttons -->
-      <button class="toolbar-btn primary" id="btn-add-node" title="Add a new node (double-click canvas)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="3" />
-          <line x1="12" y1="8" x2="12" y2="16" />
-          <line x1="8" y1="12" x2="16" y2="12" />
-        </svg>
-        <span class="btn-label">Add Node</span>
-      </button>
+      <!-- Create -->
+      <div class="toolbox-section">
+        <button class="tb-btn primary" id="btn-add-node" title="Add Node (double-click canvas)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-add-group" title="Add Group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3" stroke-dasharray="4 2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-add-sticky" title="Add Sticky Note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><polyline points="14 2 14 8 20 8"/><path d="M20 14l-6 6h6v-6z"/></svg>
+        </button>
+      </div>
 
-      <button class="toolbar-btn" id="btn-add-group" title="Add a container group">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="2" width="20" height="20" rx="3" stroke-dasharray="4 2" />
-          <line x1="12" y1="8" x2="12" y2="16" />
-          <line x1="8" y1="12" x2="16" y2="12" />
-        </svg>
-        <span class="btn-label">Add Group</span>
-      </button>
+      <div class="toolbox-divider"></div>
 
-      <div class="toolbar-separator"></div>
+      <!-- Edit -->
+      <div class="toolbox-section">
+        <button class="tb-btn danger" id="btn-delete" title="Delete selected (Del)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
 
-      <!-- Edit Actions -->
-      <button class="toolbar-btn danger" id="btn-delete" title="Delete selected (Del)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="3 6 5 6 21 6" />
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-        </svg>
-        <span class="btn-label">Delete</span>
-      </button>
+      <div class="toolbox-divider"></div>
 
-      <div class="toolbar-separator"></div>
+      <!-- History -->
+      <div class="toolbox-section">
+        <button class="tb-btn" id="btn-undo" title="Undo (⌘Z)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-redo" title="Redo (⌘⇧Z)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
+        </button>
+      </div>
 
-      <!-- Undo / Redo -->
-      <button class="toolbar-btn" id="btn-undo" title="Undo (⌘Z)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="1 4 1 10 7 10" />
-          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-        </svg>
-      </button>
+      <div class="toolbox-divider"></div>
 
-      <button class="toolbar-btn" id="btn-redo" title="Redo (⌘⇧Z)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="23 4 23 10 17 10" />
-          <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
-        </svg>
-      </button>
+      <!-- View -->
+      <div class="toolbox-section">
+        <button class="tb-btn" id="btn-zoom-in" title="Zoom In">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-zoom-out" title="Zoom Out">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-fit-view" title="Fit View">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        </button>
+      </div>
 
-      <div class="toolbar-separator"></div>
+      <div class="toolbox-divider"></div>
 
-      <!-- Zoom -->
-      <button class="toolbar-btn" id="btn-zoom-out" title="Zoom Out">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          <line x1="8" y1="11" x2="14" y2="11" />
-        </svg>
-      </button>
-
-      <button class="toolbar-btn" id="btn-zoom-in" title="Zoom In">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          <line x1="11" y1="8" x2="11" y2="14" />
-          <line x1="8" y1="11" x2="14" y2="11" />
-        </svg>
-      </button>
-
-      <button class="toolbar-btn" id="btn-fit-view" title="Fit all content in view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-        </svg>
-        <span class="btn-label">Fit</span>
-      </button>
-
-      <!-- Spacer -->
-      <div class="toolbar-spacer"></div>
-
-      <!-- File Actions -->
-      <button class="toolbar-btn" id="btn-save" title="Save (⌘S)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-          <polyline points="17 21 17 13 7 13 7 21" />
-          <polyline points="7 3 7 8 15 8" />
-        </svg>
-        <span class="btn-label">Save</span>
-      </button>
-
-      <button class="toolbar-btn" id="btn-export" title="Export as JSON file">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-        <span class="btn-label">Export</span>
-      </button>
-
-      <button class="toolbar-btn" id="btn-import" title="Import JSON file">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="17 8 12 3 7 8" />
-          <line x1="12" y1="3" x2="12" y2="15" />
-        </svg>
-        <span class="btn-label">Import</span>
-      </button>
-
-      <div class="toolbar-separator"></div>
-
-      <button class="toolbar-btn danger" id="btn-clear" title="Clear entire canvas">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="15" y1="9" x2="9" y2="15" />
-          <line x1="9" y1="9" x2="15" y2="15" />
-        </svg>
-        <span class="btn-label">Clear</span>
-      </button>
+      <!-- File -->
+      <div class="toolbox-section">
+        <button class="tb-btn" id="btn-save" title="Save (⌘S)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-export" title="Export JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-import" title="Import JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+        <button class="tb-btn danger" id="btn-clear" title="Clear Canvas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </button>
+      </div>
 
       <!-- Hidden file input for import -->
       <input type="file" id="import-file-input" accept=".json">
@@ -210,6 +167,24 @@
     <!-- ═══════════ CONTEXT MENU ═══════════ -->
     <div id="context-menu"></div>
 
+    <!-- ═══════════ COMMAND PALETTE ═══════════ -->
+    <div id="command-palette" class="hidden">
+      <div class="cp-container">
+        <div class="cp-search-row">
+          <svg class="cp-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="cp-input" placeholder="Search node types..." autocomplete="off" spellcheck="false">
+        </div>
+        <div class="cp-list" id="cp-list"></div>
+        <div class="cp-footer">
+          <span class="cp-hint"><kbd>↑↓</kbd> navigate</span>
+          <span class="cp-hint"><kbd>↵</kbd> select</span>
+          <span class="cp-hint"><kbd>Esc</kbd> close</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ═══════════ SCRIPTS ═══════════ -->
@@ -227,6 +202,7 @@
   <script src="js/properties.js"></script>
   <script src="js/keyboard.js"></script>
   <script src="js/minimap.js"></script>
+  <script src="js/commandPalette.js"></script>
   <script src="js/app.js"></script>
 </body>
 
