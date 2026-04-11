@@ -83,9 +83,7 @@ const Drag = (() => {
     }
 
     // ── Canvas click ──
-    const isEmptyCanvas = target === Canvas.container || target === Canvas.nodesLayer || 
-        target.id === 'canvas-grid' || target.parentElement === Canvas.connectionsLayer;
-    if (isEmptyCanvas) {
+    if (Canvas.isEmptyCanvasTarget(target)) {
       Selection.clearSelection();
       ConnectionRenderer.deselectAll();
 
@@ -225,11 +223,12 @@ const Drag = (() => {
         // Don't put group inside itself or its children
         if (dropGroup && dropGroup.id !== id && node.type !== 'group') {
           // Convert to relative position within group
-          const absPos = State.getAbsolutePosition(id);
+          const nodeAbsPos = State.getAbsolutePosition(id);
+          const groupAbsPos = State.getAbsolutePosition(dropGroup.id);
           if (node.parentId !== dropGroup.id) {
-            node.x = absPos.x - dropGroup.x;
-            node.y = absPos.y - dropGroup.y;
-            State.updateNode(id, { parentId: dropGroup.id, x: node.x, y: node.y });
+            const relX = nodeAbsPos.x - groupAbsPos.x;
+            const relY = nodeAbsPos.y - groupAbsPos.y;
+            State.updateNode(id, { parentId: dropGroup.id, x: relX, y: relY });
           }
         } else if (!dropGroup && node.parentId) {
           // Dragged out of group — convert to absolute position
@@ -274,7 +273,9 @@ const Drag = (() => {
       // Don't drop onto a selected group
       if (selectedIds.includes(group.id)) continue;
 
-      if (pointInRect(canvasPos.x, canvasPos.y, group.x, group.y, group.width, group.height)) {
+      // Use absolute position for accurate bounds check
+      const absPos = State.getAbsolutePosition(group.id);
+      if (pointInRect(canvasPos.x, canvasPos.y, absPos.x, absPos.y, group.width, group.height)) {
         return group;
       }
     }

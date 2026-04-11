@@ -171,6 +171,20 @@ const Canvas = (() => {
 
   /* ── Mouse Handlers ── */
 
+  /**
+   * Check if a click target is empty canvas (not on a node/UI element)
+   */
+  function isEmptyCanvasTarget(target) {
+    // If clicking on a node, port, resize handle, minimap, properties, or toolbar → NOT empty
+    if (target.closest('.canvas-node')) return false;
+    if (target.closest('#minimap')) return false;
+    if (target.closest('#properties-panel')) return false;
+    if (target.closest('#toolbar')) return false;
+    if (target.closest('#context-menu')) return false;
+    // Everything else inside the canvas container is empty canvas
+    return true;
+  }
+
   function onMouseDown(e) {
     // Middle click or Space+left click = pan
     if (e.button === 1 || (e.button === 0 && spaceHeld)) {
@@ -184,13 +198,9 @@ const Canvas = (() => {
       return;
     }
 
-    // Left-click on empty canvas = pan (not on nodes, ports, or UI)
-    // But NOT when Ctrl/Cmd held (that's box select)
+    // Left-click on empty canvas = pan (not when Ctrl/Shift held — those are for box select)
     if (e.button === 0 && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-      const target = e.target;
-      const isEmptyCanvas = target === container || target === gridCanvas ||
-        target === connectionsLayer || target.id === 'nodes-layer';
-      if (isEmptyCanvas) {
+      if (isEmptyCanvasTarget(e.target)) {
         isPanning = true;
         panStartX = e.clientX;
         panStartY = e.clientY;
@@ -443,5 +453,6 @@ const Canvas = (() => {
     set zoom(v) { zoom = v; },
     get isPanning() { return isPanning; },
     get spaceHeld() { return spaceHeld; },
+    isEmptyCanvasTarget,
   };
 })();
