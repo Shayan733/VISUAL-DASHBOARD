@@ -38,6 +38,7 @@ const Drag = (() => {
   function onMouseDown(e) {
     if (e.button !== 0) return; // Left click only
     if (Canvas.spaceHeld) return; // Space = pan, not drag
+    if (Canvas.isPanning) return; // Canvas is handling pan
 
     const target = e.target;
 
@@ -81,17 +82,18 @@ const Drag = (() => {
       return;
     }
 
-    // ── Canvas click (deselect or box select) ──
-    if (target === Canvas.container || target === Canvas.nodesLayer || 
-        target.id === 'canvas-grid' || target.parentElement === Canvas.connectionsLayer) {
-      if (!e.shiftKey) {
-        Selection.clearSelection();
-        ConnectionRenderer.deselectAll();
-      }
+    // ── Canvas click ──
+    const isEmptyCanvas = target === Canvas.container || target === Canvas.nodesLayer || 
+        target.id === 'canvas-grid' || target.parentElement === Canvas.connectionsLayer;
+    if (isEmptyCanvas) {
+      Selection.clearSelection();
+      ConnectionRenderer.deselectAll();
 
-      // Start box select
-      const rect = Canvas.container.getBoundingClientRect();
-      Selection.startBoxSelect(e.clientX - rect.left, e.clientY - rect.top);
+      // Shift+drag = box select
+      if (e.shiftKey) {
+        const rect = Canvas.container.getBoundingClientRect();
+        Selection.startBoxSelect(e.clientX - rect.left, e.clientY - rect.top);
+      }
     }
   }
 

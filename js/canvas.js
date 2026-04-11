@@ -183,6 +183,22 @@ const Canvas = (() => {
       e.preventDefault();
       return;
     }
+
+    // Left-click on empty canvas = pan (not on nodes, ports, or UI)
+    if (e.button === 0 && !e.shiftKey) {
+      const target = e.target;
+      const isEmptyCanvas = target === container || target === gridCanvas ||
+        target === connectionsLayer || target.id === 'nodes-layer';
+      if (isEmptyCanvas) {
+        isPanning = true;
+        panStartX = e.clientX;
+        panStartY = e.clientY;
+        panStartOffsetX = offsetX;
+        panStartOffsetY = offsetY;
+        container.classList.add('panning');
+        return;
+      }
+    }
   }
 
   function onMouseMove(e) {
@@ -216,8 +232,8 @@ const Canvas = (() => {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Zoom factor
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    // Zoom factor — gentle speed for smooth control
+    const delta = e.deltaY > 0 ? 0.96 : 1.04;
     const newZoom = clamp(zoom * delta, MIN_ZOOM, MAX_ZOOM);
 
     if (newZoom === zoom) return;
