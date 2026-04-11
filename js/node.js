@@ -12,8 +12,11 @@ const NodeRenderer = (() => {
     el.className = `canvas-node ${node.type === 'group' ? 'group-node' : ''} entering`;
     el.dataset.id = node.id;
     el.dataset.type = node.type;
-    el.style.left = node.x + 'px';
-    el.style.top = node.y + 'px';
+
+    // Always use absolute position for DOM placement
+    const absPos = State.getAbsolutePosition(node.id);
+    el.style.left = absPos.x + 'px';
+    el.style.top = absPos.y + 'px';
     el.style.width = node.width + 'px';
     if (node.type === 'group') {
       el.style.height = node.height + 'px';
@@ -116,8 +119,10 @@ const NodeRenderer = (() => {
    * Update existing node element
    */
   function updateNodeElement(el, node) {
-    el.style.left = node.x + 'px';
-    el.style.top = node.y + 'px';
+    // Always use absolute position for DOM placement
+    const absPos = State.getAbsolutePosition(node.id);
+    el.style.left = absPos.x + 'px';
+    el.style.top = absPos.y + 'px';
     el.style.width = node.width + 'px';
 
     if (node.type === 'group') {

@@ -89,8 +89,8 @@ const Drag = (() => {
       Selection.clearSelection();
       ConnectionRenderer.deselectAll();
 
-      // Shift+drag = box select
-      if (e.shiftKey) {
+      // Shift+drag or Ctrl/Cmd+drag = box select
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
         const rect = Canvas.container.getBoundingClientRect();
         Selection.startBoxSelect(e.clientX - rect.left, e.clientY - rect.top);
       }
@@ -168,16 +168,32 @@ const Drag = (() => {
 
     if (!hasMoved) return;
 
-    // Add dragging class
+    // Move all selected nodes
     dragNodeStartPositions.forEach(({ id, x, y }) => {
       const el = Canvas.nodesLayer.querySelector(`[data-id="${id}"]`);
       if (el) el.classList.add('dragging');
 
       State.updateNode(id, { x: x + dx, y: y + dy });
 
+      // Use absolute position for DOM placement
+      const absPos = State.getAbsolutePosition(id);
       if (el) {
-        el.style.left = (x + dx) + 'px';
-        el.style.top = (y + dy) + 'px';
+        el.style.left = absPos.x + 'px';
+        el.style.top = absPos.y + 'px';
+      }
+
+      // If this is a group, also update all child node DOM positions
+      const node = State.getNodeById(id);
+      if (node && node.type === 'group') {
+        const children = State.getChildren(id);
+        children.forEach(child => {
+          const childEl = Canvas.nodesLayer.querySelector(`[data-id="${child.id}"]`);
+          if (childEl) {
+            const childAbsPos = State.getAbsolutePosition(child.id);
+            childEl.style.left = childAbsPos.x + 'px';
+            childEl.style.top = childAbsPos.y + 'px';
+          }
+        });
       }
     });
 

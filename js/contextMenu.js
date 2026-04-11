@@ -105,6 +105,12 @@ const ContextMenu = (() => {
       <div class="ctx-separator"></div>
       <div class="ctx-header">Color</div>
       <div class="ctx-color-row">${colorSwatches}</div>
+      ${node.parentId ? `
+      <div class="ctx-separator"></div>
+      <div class="ctx-item" data-action="remove-from-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Remove from Group
+      </div>` : ''}
       <div class="ctx-separator"></div>
       <div class="ctx-item" data-action="duplicate">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -357,6 +363,19 @@ const ContextMenu = (() => {
 
       case 'select-all': {
         Selection.selectAll();
+        break;
+      }
+
+      case 'remove-from-group': {
+        const node = State.getNodeById(currentTarget.id);
+        if (node && node.parentId) {
+          // Convert relative position to absolute before unparenting
+          const absPos = State.getAbsolutePosition(node.id);
+          State.updateNode(node.id, { parentId: null, x: absPos.x, y: absPos.y });
+          History.push();
+          NodeRenderer.renderAll();
+          ConnectionRenderer.renderAll();
+        }
         break;
       }
     }

@@ -185,7 +185,8 @@ const Canvas = (() => {
     }
 
     // Left-click on empty canvas = pan (not on nodes, ports, or UI)
-    if (e.button === 0 && !e.shiftKey) {
+    // But NOT when Ctrl/Cmd held (that's box select)
+    if (e.button === 0 && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
       const target = e.target;
       const isEmptyCanvas = target === container || target === gridCanvas ||
         target === connectionsLayer || target.id === 'nodes-layer';
