@@ -91,6 +91,35 @@ const Auth = (() => {
     }
 
     try {
+      // Handle email confirmation redirect from Supabase
+      const hash = window.location.hash;
+      if (hash && hash.includes('access_token')) {
+        // Extract tokens from hash
+        const params = new URLSearchParams(hash.replace('#', ''));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          // Set the session with tokens from email link
+          await SupabaseClient.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          // Clear the hash to clean up URL
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+
+      // Check for error in URL (otp_expired, etc)
+      if (hash && hash.includes('error=')) {
+        const errorParams = new URLSearchParams(hash.replace('#', ''));
+        const error = errorParams.get('error_description');
+        if (error) {
+          showToast('Login error: ' + error, 'error');
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+
       const { data: { session } } = await SupabaseClient.auth.getSession();
       if (!session) {
         showAuthModal();
