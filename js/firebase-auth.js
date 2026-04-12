@@ -83,6 +83,24 @@ const FirebaseAuth = (() => {
 
   const getUser = () => getAuth().currentUser;
 
+  // Wait for window.SupabaseClient to be ready (CDN loads async)
+  const waitForSupabase = () => {
+    return new Promise((resolve, reject) => {
+      if (window.SupabaseClient) { resolve(); return; }
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (window.SupabaseClient) {
+          clearInterval(interval);
+          resolve();
+        } else if (attempts >= 40) { // 4 seconds max
+          clearInterval(interval);
+          reject(new Error('Supabase client failed to initialize'));
+        }
+      }, 100);
+    });
+  };
+
   // Called by app.js on startup. Returns the Firebase user or null.
   const init = async () => {
     const auth = getAuth();
@@ -115,6 +133,14 @@ const FirebaseAuth = (() => {
     if (firebaseUser) {
       State.user = normalizeUser(firebaseUser);
       hideAuthModal();
+      // Wait for Supabase CDN to finish loading before hitting the DB
+      try {
+        await waitForSupabase();
+      } catch (err) {
+        console.error('Supabase init timeout:', err);
+        if (window.showToast) showToast('Database connection failed', 'error');
+        return firebaseUser;
+      }
       await Sync.loadMostRecentCanvas();
     } else {
       showAuthModal();
