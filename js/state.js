@@ -79,6 +79,7 @@ const State = (() => {
       status: null,
       parentId: null,
       collapsed: false,
+      attachments: [],
       ...nodeData,
     };
     state.nodes.push(node);
@@ -104,6 +105,7 @@ const State = (() => {
       status: null,
       parentId: null,
       collapsed: false,
+      attachments: [],
       ...groupData,
     };
     state.nodes.push(group);

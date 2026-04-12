@@ -277,14 +277,17 @@
   <!-- ═══════════ SCRIPTS ═══════════ -->
   <!-- Load order matters: utilities first, then modules, then app last -->
 
-  <!-- Firebase SDK (auth only) -->
+  <!-- Firebase SDK (auth + firestore + storage) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
-  <!-- Phase 2: config, Firebase auth, Supabase DB, sync -->
+  <!-- Config, Firebase auth, Firestore DB, sync -->
   <script src="js/config.js"></script>
   <script src="js/firebase-auth.js"></script>
-  <script src="js/supabase.js"></script>
+  <script src="js/firestore.js"></script>
+  <script src="js/firebase-storage.js"></script>
   <script src="js/sync.js"></script>
 
   <!-- Core utilities and state -->

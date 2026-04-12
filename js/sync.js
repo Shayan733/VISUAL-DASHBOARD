@@ -1,60 +1,86 @@
 /* ============================================
-   Sync — Cloud persistence (Supabase)
+   Sync — Cloud persistence (Firestore)
+   Replaces Supabase with Firebase Firestore.
+
+   Save strategy:
+   - Idle save: fires 5 s after the last state
+     change, but ONLY when the user is not
+     actively dragging or resizing.
+   - Drag/resize end: immediate save triggered
+     by drag.js calling Sync.debouncedSave().
+   - Manual save: Ctrl+S calls Sync.saveCanvas()
+   - Page unload: saveCanvas() called directly.
+   - Every save is an UPDATE (upsert) of a single
+     Firestore document — nothing ever accumulates.
    ============================================ */
 
 const Sync = (() => {
-  let saveTimeout = null;
-  const DEBOUNCE_MS = 500;
+  const IDLE_MS = 5000; // ms of inactivity before auto-save fires
+  let idleTimer = null;
+  let hasUnsavedChanges = false;
+
+  /* ── helpers ── */
+
+  const db = () => FirestoreDB.db;
+  const canvasesCol = () => db().collection('canvases');
+  const snapshotsCol = () => db().collection('canvas_snapshots');
+
+  /* ── Core save ── */
 
   const saveCanvas = async () => {
-    if (!State.currentCanvasId || !State.user || !window.SupabaseClient) return;
+    if (!State.currentCanvasId || !State.user) return;
 
     try {
       const state = State.toJSON();
-      const { error } = await SupabaseClient
-        .from('canvases')
-        .update({
-          state_json: state,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', State.currentCanvasId)
-        .eq('user_id', State.user.id);
-
-      if (error) {
-        console.error('Save failed:', error);
-      }
+      await canvasesCol().doc(State.currentCanvasId).update({
+        stateJson: state,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      hasUnsavedChanges = false;
     } catch (e) {
       console.error('Save error:', e);
     }
   };
 
+  /**
+   * Called by state change listeners AND by drag.js on mouse-up.
+   * Skips scheduling while actively dragging/resizing — drag.js
+   * calls this again on finishNodeDrag / finishResize so the
+   * final position is always persisted.
+   */
   const debouncedSave = () => {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => saveCanvas(), DEBOUNCE_MS);
+    hasUnsavedChanges = true;
+
+    // Don't schedule a timer mid-drag — wait for mouse release
+    if (Drag.isDragging || Drag.isResizing || Drag.isConnecting) return;
+
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(async () => {
+      if (hasUnsavedChanges && !Drag.isDragging && !Drag.isResizing) {
+        await saveCanvas();
+      }
+    }, IDLE_MS);
   };
 
+  /* ── Load ── */
+
   const loadCanvas = async (canvasId) => {
-    if (!State.user || !window.SupabaseClient) return;
+    if (!State.user) return;
 
     try {
-      // Save current canvas first
+      // Persist current canvas before switching
       if (State.currentCanvasId) await saveCanvas();
 
-      // Load new canvas
-      const { data, error } = await SupabaseClient
-        .from('canvases')
-        .select('*')
-        .eq('id', canvasId)
-        .eq('user_id', State.user.id)
-        .single();
+      const doc = await canvasesCol().doc(canvasId).get();
 
-      if (error) {
-        showToast('Failed to load canvas', 'error');
+      if (!doc.exists || doc.data().userId !== State.user.id) {
+        showToast('Canvas not found', 'error');
         return;
       }
 
+      const data = doc.data();
       State.currentCanvasId = canvasId;
-      State.loadFromJSON(data.state_json || { nodes: [], connections: [] });
+      State.loadFromJSON(data.stateJson || { nodes: [], connections: [] });
       NodeRenderer.renderAll();
       ConnectionRenderer.renderAll();
       Sidebar.updateActive(canvasId);
@@ -65,91 +91,79 @@ const Sync = (() => {
   };
 
   const loadMostRecentCanvas = async () => {
-    if (!State.user || !window.SupabaseClient) return;
+    if (!State.user) return;
 
     try {
-      const { data, error } = await SupabaseClient
-        .from('canvases')
-        .select('id, name, state_json, updated_at')
-        .eq('user_id', State.user.id)
-        .order('updated_at', { ascending: false })
-        .limit(1);
+      const snapshot = await canvasesCol()
+        .where('userId', '==', State.user.id)
+        .orderBy('updatedAt', 'desc')
+        .limit(1)
+        .get();
 
-      if (error) {
-        console.error('Load canvas error:', error);
-        // Rate limited or no permission - create blank
+      if (snapshot.empty) {
         await createCanvas('Untitled');
         return;
       }
 
-      if (!data || data.length === 0) {
-        // No canvases yet, create blank
-        await createCanvas('Untitled');
-        return;
-      }
-
-      const canvas = data[0];
-      State.currentCanvasId = canvas.id;
-      State.loadFromJSON(canvas.state_json || { nodes: [], connections: [] });
+      const doc = snapshot.docs[0];
+      const data = doc.data();
+      State.currentCanvasId = doc.id;
+      State.loadFromJSON(data.stateJson || { nodes: [], connections: [] });
       NodeRenderer.renderAll();
       ConnectionRenderer.renderAll();
     } catch (e) {
       console.error('Load most recent error:', e);
-      // Silently create blank on error to avoid infinite loops
       if (!State.currentCanvasId) {
         await createCanvas('Untitled');
       }
     }
   };
 
+  /* ── List ── */
+
   const listCanvases = async () => {
-    if (!State.user || !window.SupabaseClient) return [];
+    if (!State.user) return [];
 
     try {
-      const { data, error } = await SupabaseClient
-        .from('canvases')
-        .select('id, name, color, updated_at')
-        .eq('user_id', State.user.id)
-        .order('updated_at', { ascending: false });
+      const snapshot = await canvasesCol()
+        .where('userId', '==', State.user.id)
+        .orderBy('updatedAt', 'desc')
+        .get();
 
-      if (error) {
-        console.error('List canvases error:', error);
-        return [];
-      }
-      return data || [];
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        color: doc.data().color,
+        updatedAt: doc.data().updatedAt,
+      }));
     } catch (e) {
       console.error('List canvases error:', e);
       return [];
     }
   };
 
+  /* ── Create ── */
+
   const createCanvas = async (name = 'Untitled', type = 'freeform') => {
-    if (!State.user || !window.SupabaseClient) return null;
+    if (!State.user) return null;
 
     try {
-      const { data, error } = await SupabaseClient
-        .from('canvases')
-        .insert([{
-          user_id: State.user.id,
-          name: name,
-          type: type,
-          state_json: { nodes: [], connections: [] }
-        }])
-        .select()
-        .single();
+      const docRef = await canvasesCol().add({
+        userId: State.user.id,
+        name,
+        type,
+        color: null,
+        stateJson: { nodes: [], connections: [] },
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
 
-      if (error) {
-        showToast('Failed to create canvas', 'error');
-        return null;
-      }
-
-      State.currentCanvasId = data.id;
+      State.currentCanvasId = docRef.id;
       State.clear();
-      State.loadFromJSON(data.state_json || { nodes: [], connections: [] });
       NodeRenderer.renderAll();
       ConnectionRenderer.renderAll();
       Sidebar.refresh();
-      return data;
+      return { id: docRef.id, name, type };
     } catch (e) {
       console.error('Create canvas error:', e);
       showToast('Failed to create canvas', 'error');
@@ -157,20 +171,22 @@ const Sync = (() => {
     }
   };
 
+  /* ── Delete ── */
+
   const deleteCanvas = async (canvasId) => {
-    if (!State.user || !window.SupabaseClient) return;
+    if (!State.user) return;
 
     try {
-      const { error } = await SupabaseClient
-        .from('canvases')
-        .delete()
-        .eq('id', canvasId)
-        .eq('user_id', State.user.id);
+      // Delete canvas document
+      await canvasesCol().doc(canvasId).delete();
 
-      if (error) {
-        showToast('Failed to delete canvas', 'error');
-        return;
-      }
+      // Delete all snapshots for this canvas
+      const snaps = await snapshotsCol()
+        .where('canvasId', '==', canvasId)
+        .get();
+      const batch = db().batch();
+      snaps.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
 
       if (State.currentCanvasId === canvasId) {
         await loadMostRecentCanvas();
@@ -183,38 +199,28 @@ const Sync = (() => {
     }
   };
 
+  /* ── Duplicate ── */
+
   const duplicateCanvas = async (canvasId) => {
-    if (!State.user || !window.SupabaseClient) return;
+    if (!State.user) return;
 
     try {
-      const { data: original, error: fetchError } = await SupabaseClient
-        .from('canvases')
-        .select('*')
-        .eq('id', canvasId)
-        .eq('user_id', State.user.id)
-        .single();
-
-      if (fetchError) {
+      const doc = await canvasesCol().doc(canvasId).get();
+      if (!doc.exists) {
         showToast('Failed to duplicate canvas', 'error');
         return;
       }
+      const original = doc.data();
 
-      const { data, error } = await SupabaseClient
-        .from('canvases')
-        .insert([{
-          user_id: State.user.id,
-          name: original.name + ' (copy)',
-          color: original.color,
-          type: original.type,
-          state_json: original.state_json
-        }])
-        .select()
-        .single();
-
-      if (error) {
-        showToast('Failed to duplicate canvas', 'error');
-        return;
-      }
+      await canvasesCol().add({
+        userId: State.user.id,
+        name: original.name + ' (copy)',
+        color: original.color,
+        type: original.type,
+        stateJson: original.stateJson,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
 
       Sidebar.refresh();
       showToast('Canvas duplicated', 'success');
@@ -224,24 +230,30 @@ const Sync = (() => {
     }
   };
 
+  /* ── Canvas metadata (name / color) ── */
+
+  const updateCanvasMeta = async (canvasId, updates) => {
+    if (!State.user) return;
+    try {
+      await canvasesCol().doc(canvasId).update(updates);
+    } catch (e) {
+      console.error('Update canvas meta error:', e);
+    }
+  };
+
+  /* ── Snapshots ── */
+
   const saveSnapshot = async (name) => {
-    if (!State.currentCanvasId || !State.user || !window.SupabaseClient) return;
+    if (!State.currentCanvasId || !State.user) return;
 
     try {
-      const { error } = await SupabaseClient
-        .from('canvas_snapshots')
-        .insert([{
-          canvas_id: State.currentCanvasId,
-          name: name,
-          state_json: State.toJSON(),
-          created_by: State.user.id
-        }]);
-
-      if (error) {
-        showToast('Failed to save snapshot', 'error');
-        return;
-      }
-
+      await snapshotsCol().add({
+        canvasId: State.currentCanvasId,
+        name,
+        stateJson: State.toJSON(),
+        createdBy: State.user.id,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
       showToast(`Snapshot "${name}" saved`, 'success');
     } catch (e) {
       console.error('Save snapshot error:', e);
@@ -250,17 +262,13 @@ const Sync = (() => {
   };
 
   const listSnapshots = async (canvasId) => {
-    if (!window.SupabaseClient) return [];
-
     try {
-      const { data, error } = await SupabaseClient
-        .from('canvas_snapshots')
-        .select('*')
-        .eq('canvas_id', canvasId)
-        .order('created_at', { ascending: false });
+      const snapshot = await snapshotsCol()
+        .where('canvasId', '==', canvasId)
+        .orderBy('createdAt', 'desc')
+        .get();
 
-      if (error) return [];
-      return data || [];
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       console.error('List snapshots error:', e);
       return [];
@@ -268,21 +276,14 @@ const Sync = (() => {
   };
 
   const restoreSnapshot = async (snapshotId) => {
-    if (!window.SupabaseClient) return;
-
     try {
-      const { data, error } = await SupabaseClient
-        .from('canvas_snapshots')
-        .select('state_json')
-        .eq('id', snapshotId)
-        .single();
-
-      if (error) {
-        showToast('Failed to restore snapshot', 'error');
+      const doc = await snapshotsCol().doc(snapshotId).get();
+      if (!doc.exists) {
+        showToast('Snapshot not found', 'error');
         return;
       }
 
-      State.loadFromJSON(data.state_json);
+      State.loadFromJSON(doc.data().stateJson);
       NodeRenderer.renderAll();
       ConnectionRenderer.renderAll();
       await saveCanvas();
@@ -293,14 +294,13 @@ const Sync = (() => {
     }
   };
 
-  // Hook state changes to auto-save
+  /* ── Auto-save wiring ── */
+
   const enableAutoSave = () => {
-    // Subscribe to state changes
     State.on((event) => {
-      // Auto-save on most events except loaded/cleared
-      if (event && !['loaded', 'cleared', 'saved'].includes(event)) {
-        debouncedSave();
-      }
+      // Skip events that don't represent a user change worth saving
+      if (!event || ['loaded', 'cleared', 'saved'].includes(event)) return;
+      debouncedSave();
     });
   };
 
@@ -312,10 +312,11 @@ const Sync = (() => {
     createCanvas,
     deleteCanvas,
     duplicateCanvas,
+    updateCanvasMeta,
     saveSnapshot,
     listSnapshots,
     restoreSnapshot,
     enableAutoSave,
-    debouncedSave
+    debouncedSave,
   };
 })();

@@ -261,6 +261,9 @@ const Drag = (() => {
 
     dragNodeStartPositions = [];
     dragTarget = null;
+
+    // Save final position — drag is over, idle timer is now safe to fire
+    Sync.debouncedSave();
   }
 
   function checkGroupDropTargets(e) {
@@ -423,6 +426,9 @@ const Drag = (() => {
     isResizing = false;
     History.push();
     resizeTarget = null;
+
+    // Save final size — resize is over
+    Sync.debouncedSave();
   }
 
   return {
