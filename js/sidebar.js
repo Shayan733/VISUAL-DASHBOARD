@@ -54,10 +54,11 @@ const Sidebar = (() => {
       item.dataset.canvasId = canvas.id;
       item.classList.toggle('active', canvas.id === State.currentCanvasId);
 
-      const timeAgo = getTimeAgo(canvas.updated_at);
+      const timeAgo = canvas.updatedAt ? getTimeAgo(canvas.updatedAt.toDate ? canvas.updatedAt.toDate() : canvas.updatedAt) : 'just now';
+      const dotColor = canvas.color || '818cf8';
 
       item.innerHTML = `
-        <div class="canvas-dot" style="background: #${canvas.color};"></div>
+        <div class="canvas-dot" style="background: #${dotColor};"></div>
         <div class="canvas-info">
           <div class="canvas-name">${escapeHtml(canvas.name)}</div>
           <div class="canvas-time">${timeAgo}</div>
