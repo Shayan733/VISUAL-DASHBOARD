@@ -44,8 +44,8 @@ const App = (() => {
       return;
     }
 
-    // Phase 2: Check authentication
-    await Auth.init();
+    // Phase 2: Check authentication (Firebase)
+    await FirebaseAuth.init();
 
     // If no user after auth check, stop here (auth modal shown)
     if (!State.user) {

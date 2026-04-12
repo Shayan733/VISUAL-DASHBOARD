@@ -195,14 +195,14 @@
       <div class="modal-content" style="max-width: 400px;">
         <h1 style="margin-bottom: 16px; font-size: 20px; color: var(--text-primary);">Sign in to Visual Dashboard</h1>
 
-        <button onclick="Auth.googleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
+        <button onclick="FirebaseAuth.googleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
           Google Sign In
         </button>
 
         <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">or</div>
 
         <input type="email" id="magic-email" placeholder="your@email.com" style="width: 100%; padding: 8px 12px; margin-bottom: 8px; background: var(--node-bg-resting); border: 0.5px solid var(--node-border-rest); color: var(--text-primary); border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
-        <button onclick="Auth.magicLinkLogin(document.getElementById('magic-email').value)" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
+        <button onclick="FirebaseAuth.magicLinkLogin(document.getElementById('magic-email').value)" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
           Send Magic Link
         </button>
 
@@ -277,10 +277,14 @@
   <!-- ═══════════ SCRIPTS ═══════════ -->
   <!-- Load order matters: utilities first, then modules, then app last -->
 
-  <!-- Phase 2: Supabase, auth, sync -->
+  <!-- Firebase SDK (auth only) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <!-- Phase 2: config, Firebase auth, Supabase DB, sync -->
   <script src="js/config.js"></script>
+  <script src="js/firebase-auth.js"></script>
   <script src="js/supabase.js"></script>
-  <script src="js/auth.js"></script>
   <script src="js/sync.js"></script>
 
   <!-- Core utilities and state -->

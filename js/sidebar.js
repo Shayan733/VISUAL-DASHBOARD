@@ -19,7 +19,7 @@ const Sidebar = (() => {
 
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
-        await Auth.logout();
+        await FirebaseAuth.logout();
       });
     }
 
