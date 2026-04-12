@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "node-api",
+      "label": "API Gateway",
+      "groupId": null,
+      "x": 100,
+      "y": 150,
+      "width": 120,
+      "height": 60,
+      "color": "534AB7",
+      "status": "done",
+      "description": "REST endpoints"
+    },
+    {
+      "id": "node-db",
+      "label": "Database",
+      "groupId": null,
+      "x": 350,
+      "y": 50,
+      "width": 120,
+      "height": 60,
+      "color": "4A90E2",
+      "status": "done",
+      "description": "Postgres"
+    },
+    {
+      "id": "node-queue",
+      "label": "Message Queue",
+      "groupId": null,
+      "x": 350,
+      "y": 150,
+      "width": 120,
+      "height": 60,
+      "color": "F5A623",
+      "status": "done",
+      "description": "Event streaming"
+    },
+    {
+      "id": "node-cache",
+      "label": "Cache",
+      "groupId": null,
+      "x": 350,
+      "y": 250,
+      "width": 120,
+      "height": 60,
+      "color": "2DADC1",
+      "status": "done",
+      "description": "Redis"
+    },
+    {
+      "id": "node-webhook",
+      "label": "Webhook Processor",
+      "groupId": null,
+      "x": 600,
+      "y": 150,
+      "width": 140,
+      "height": 60,
+      "color": "52C41A",
+      "status": "done",
+      "description": "External integrations"
+    }
+  ],
+  "groups": [],
+  "connections": [
+    {
+      "id": "conn-1",
+      "sourceId": "node-api",
+      "targetId": "node-db",
+      "label": "writes to"
+    },
+    {
+      "id": "conn-2",
+      "sourceId": "node-db",
+      "targetId": "node-api",
+      "label": "reads from"
+    },
+    {
+      "id": "conn-3",
+      "sourceId": "node-db",
+      "targetId": "node-queue",
+      "label": "triggers"
+    },
+    {
+      "id": "conn-4",
+      "sourceId": "node-queue",
+      "targetId": "node-webhook",
+      "label": "notifies"
+    },
+    {
+      "id": "conn-5",
+      "sourceId": "node-api",
+      "targetId": "node-cache",
+      "label": "checks"
+    },
+    {
+      "id": "conn-6",
+      "sourceId": "node-cache",
+      "targetId": "node-api",
+      "label": "serves"
+    }
+  ]
+}

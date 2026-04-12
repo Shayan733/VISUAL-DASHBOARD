@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/minimap.css">
   <link rel="stylesheet" href="css/commandPalette.css">
+  <link rel="stylesheet" href="css/welcome-modal.css">
 
   <!-- Favicon -->
   <link rel="icon"
@@ -117,6 +118,12 @@
         <button class="tb-btn" id="btn-import" title="Import JSON">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </button>
+        <button class="tb-btn" id="btn-export-png" title="Export PNG">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button class="tb-btn" id="btn-share" title="Share Canvas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
         <button class="tb-btn danger" id="btn-clear" title="Clear Canvas">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         </button>
@@ -164,6 +171,45 @@
       </div>
     </div>
 
+    <!-- ═══════════ WELCOME MODAL ═══════════ -->
+    <div id="welcome-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content welcome-modal">
+        <div class="modal-header">
+          <h1>Welcome to Visual Dashboard</h1>
+          <p>Map any process, any project, any system.</p>
+        </div>
+
+        <div class="templates-grid">
+          <div class="template-card" data-template="workflow">
+            <div class="template-icon">⚙️</div>
+            <h3>Workflow</h3>
+            <p>Release processes, CI/CD pipelines, team workflows</p>
+            <button class="btn btn-primary">Use Template</button>
+          </div>
+
+          <div class="template-card" data-template="planning">
+            <div class="template-icon">📋</div>
+            <h3>Planning</h3>
+            <p>Q1 roadmap, sprint planning, milestones</p>
+            <button class="btn btn-primary">Use Template</button>
+          </div>
+
+          <div class="template-card" data-template="system">
+            <div class="template-icon">🏗️</div>
+            <h3>System</h3>
+            <p>Architecture diagrams, data flows, integrations</p>
+            <button class="btn btn-primary">Use Template</button>
+          </div>
+        </div>
+
+        <div class="modal-divider"><span>or</span></div>
+
+        <button id="start-blank-btn" class="btn btn-secondary">
+          Start with blank canvas
+        </button>
+      </div>
+    </div>
+
     <!-- ═══════════ CONTEXT MENU ═══════════ -->
     <div id="context-menu"></div>
 
@@ -203,6 +249,8 @@
   <script src="js/keyboard.js"></script>
   <script src="js/minimap.js"></script>
   <script src="js/commandPalette.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="js/welcome.js"></script>
   <script src="js/app.js"></script>
 </body>
 

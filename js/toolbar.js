@@ -20,6 +20,8 @@ const Toolbar = (() => {
     document.getElementById('btn-save').addEventListener('click', save);
     document.getElementById('btn-export').addEventListener('click', () => State.exportJSON());
     document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file-input').click());
+    document.getElementById('btn-export-png').addEventListener('click', exportPNG);
+    document.getElementById('btn-share').addEventListener('click', shareCanvas);
     document.getElementById('btn-clear').addEventListener('click', clearCanvas);
     document.getElementById('toolbox-close').addEventListener('click', hide);
 
@@ -115,6 +117,49 @@ const Toolbar = (() => {
       NodeRenderer.renderAll();
       ConnectionRenderer.renderAll();
     }
+  }
+
+  async function exportPNG() {
+    if (State.readOnly) {
+      showSaveIndicator('Cannot export in read-only mode');
+      return;
+    }
+    const canvas = document.querySelector('#canvas-container');
+    if (!canvas) {
+      showSaveIndicator('No canvas to export');
+      return;
+    }
+    try {
+      const image = await html2canvas(canvas, {
+        backgroundColor: '#0c0c14',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+      const link = document.createElement('a');
+      link.href = image.toDataURL('image/png');
+      link.download = `canvas-${new Date().toISOString().split('T')[0]}.png`;
+      link.click();
+      showSaveIndicator('Canvas exported as PNG');
+    } catch (error) {
+      showSaveIndicator('Export failed: ' + error.message);
+    }
+  }
+
+  function shareCanvas() {
+    if (State.readOnly) {
+      showSaveIndicator('Cannot share in read-only mode');
+      return;
+    }
+    const state = State.toJSON();
+    const encoded = btoa(encodeURIComponent(JSON.stringify(state)));
+    const url = window.location.origin + window.location.pathname + `#state=${encoded}`;
+
+    navigator.clipboard.writeText(url).then(() => {
+      showSaveIndicator('Shareable link copied to clipboard');
+    }).catch(() => {
+      showSaveIndicator('Copy failed. URL: ' + url);
+    });
   }
 
   /* ── Delete ── */

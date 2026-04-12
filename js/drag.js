@@ -39,6 +39,7 @@ const Drag = (() => {
     if (e.button !== 0) return; // Left click only
     if (Canvas.spaceHeld) return; // Space = pan, not drag
     if (Canvas.isPanning) return; // Canvas is handling pan
+    if (State.readOnly) return; // Read-only mode: no dragging
 
     const target = e.target;
 

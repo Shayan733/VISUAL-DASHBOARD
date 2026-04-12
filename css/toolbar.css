@@ -199,3 +199,23 @@
 #import-file-input {
   display: none;
 }
+
+/* ── Read-only mode ── */
+body.read-only #btn-add-node,
+body.read-only #btn-add-group,
+body.read-only #btn-add-sticky,
+body.read-only #btn-delete,
+body.read-only #btn-import,
+body.read-only #btn-clear {
+  display: none;
+}
+
+body.read-only #properties-panel {
+  display: none !important;
+}
+
+body.read-only #btn-export-png,
+body.read-only #btn-share {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

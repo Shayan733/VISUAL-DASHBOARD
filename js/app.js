@@ -17,22 +17,44 @@ const App = (() => {
     Keyboard.init();
     Minimap.init();
     CommandPalette.init();
+    WelcomeModal.init();
 
     // Listen for state changes
     State.on(onStateChange);
 
-    // Try to load saved state
-    const loaded = State.load();
-    if (loaded) {
-      console.log('✅ Restored saved state');
-      NodeRenderer.renderAll();
-      ConnectionRenderer.renderAll();
+    // Check for read-only mode via URL hash
+    const hash = window.location.hash;
+    if (hash && hash.includes('state=')) {
+      const encoded = hash.replace('#state=', '');
+      try {
+        const state = JSON.parse(decodeURIComponent(atob(encoded)));
+        State.loadFromJSON(state);
+        State.readOnly = true;
+        document.body.classList.add('read-only');
+        console.log('📖 Read-only mode enabled');
+        if (window.showToast) {
+          showToast('Read-only mode. Export as PNG to download.', 'info');
+        }
+        NodeRenderer.renderAll();
+        ConnectionRenderer.renderAll();
+      } catch (e) {
+        console.error('Failed to decode state', e);
+      }
     } else {
-      console.log('📋 Fresh canvas — starting empty');
-      // Push initial empty state to history
+      // Normal startup: check localStorage
+      const saved = localStorage.getItem('vd_canvas');
+      const welcomed = localStorage.getItem('vd_welcomed');
+
+      if (!saved && !welcomed) {
+        WelcomeModal.show();
+      } else if (saved) {
+        State.loadFromJSON(JSON.parse(saved));
+        NodeRenderer.renderAll();
+        ConnectionRenderer.renderAll();
+      }
+
+      // Push initial state to history
       History.push();
-      // Center the view
-      Canvas.fitView([]);
     }
 
     // Double-click on canvas to create node

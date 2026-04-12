@@ -1,0 +1,179 @@
+/* ============================================
+   Welcome Modal Styles
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalSlideIn var(--transition-normal);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.welcome-modal .modal-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.welcome-modal .modal-header h1 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-1);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.welcome-modal .modal-header p {
+  font-size: var(--font-size-md);
+  color: var(--text-2);
+  margin: 0;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.template-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.template-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.template-icon {
+  font-size: 40px;
+  margin-bottom: var(--space-md);
+}
+
+.template-card h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-1);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.template-card p {
+  font-size: var(--font-size-sm);
+  color: var(--text-2);
+  margin: 0 0 var(--space-lg) 0;
+  line-height: 1.4;
+}
+
+.template-card .btn {
+  width: 100%;
+}
+
+.modal-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-2xl) 0;
+  color: var(--text-3);
+  font-size: var(--font-size-sm);
+}
+
+.modal-divider::before,
+.modal-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.modal-divider span {
+  padding: 0 var(--space-md);
+}
+
+#start-blank-btn {
+  width: 100%;
+}
+
+/* Buttons */
+.btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-family);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.btn-secondary {
+  background: var(--surface-3);
+  color: var(--text-1);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-4);
+  border-color: var(--border-hover);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: var(--space-xl);
+    margin: var(--space-lg);
+  }
+
+  .templates-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .welcome-modal .modal-header h1 {
+    font-size: var(--font-size-lg);
+  }
+}

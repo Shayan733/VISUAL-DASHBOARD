@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "node-design",
+      "label": "Design",
+      "groupId": "group-dev",
+      "x": 100,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "534AB7",
+      "status": "done",
+      "description": "Design system and mockups"
+    },
+    {
+      "id": "node-build",
+      "label": "Build",
+      "groupId": "group-dev",
+      "x": 300,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "4A90E2",
+      "status": "in-progress",
+      "description": "Implementation and coding"
+    },
+    {
+      "id": "node-test",
+      "label": "Test",
+      "groupId": "group-dev",
+      "x": 500,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "F5A623",
+      "status": "todo",
+      "description": "QA and testing"
+    },
+    {
+      "id": "node-deploy",
+      "label": "Deploy",
+      "groupId": "group-prod",
+      "x": 700,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "52C41A",
+      "status": "todo",
+      "description": "Push to production"
+    },
+    {
+      "id": "node-monitor",
+      "label": "Monitor",
+      "groupId": "group-prod",
+      "x": 900,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "2DADC1",
+      "status": "todo",
+      "description": "Track metrics and errors"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-dev",
+      "label": "Development",
+      "x": 50,
+      "y": 50,
+      "width": 500,
+      "height": 200,
+      "color": "534AB7"
+    },
+    {
+      "id": "group-prod",
+      "label": "Production",
+      "x": 650,
+      "y": 50,
+      "width": 350,
+      "height": 200,
+      "color": "4A90E2"
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1",
+      "sourceId": "node-design",
+      "targetId": "node-build",
+      "label": "feeds"
+    },
+    {
+      "id": "conn-2",
+      "sourceId": "node-build",
+      "targetId": "node-test",
+      "label": "triggers"
+    },
+    {
+      "id": "conn-3",
+      "sourceId": "node-test",
+      "targetId": "node-deploy",
+      "label": "clears"
+    },
+    {
+      "id": "conn-4",
+      "sourceId": "node-deploy",
+      "targetId": "node-monitor",
+      "label": "feeds"
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "nodes": [
+    {
+      "id": "task-p1",
+      "label": "User Research",
+      "groupId": "group-product",
+      "x": 100,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "534AB7",
+      "status": "in-progress",
+      "description": ""
+    },
+    {
+      "id": "task-p2",
+      "label": "Roadmap Planning",
+      "groupId": "group-product",
+      "x": 260,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "534AB7",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-p3",
+      "label": "Feature Specs",
+      "groupId": "group-product",
+      "x": 420,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "534AB7",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-p4",
+      "label": "Review Metrics",
+      "groupId": "group-product",
+      "x": 580,
+      "y": 100,
+      "width": 120,
+      "height": 60,
+      "color": "534AB7",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-e1",
+      "label": "Architecture Review",
+      "groupId": "group-engineering",
+      "x": 100,
+      "y": 250,
+      "width": 120,
+      "height": 60,
+      "color": "4A90E2",
+      "status": "done",
+      "description": ""
+    },
+    {
+      "id": "task-e2",
+      "label": "Infrastructure Setup",
+      "groupId": "group-engineering",
+      "x": 260,
+      "y": 250,
+      "width": 120,
+      "height": 60,
+      "color": "4A90E2",
+      "status": "in-progress",
+      "description": ""
+    },
+    {
+      "id": "task-e3",
+      "label": "API Development",
+      "groupId": "group-engineering",
+      "x": 420,
+      "y": 250,
+      "width": 120,
+      "height": 60,
+      "color": "4A90E2",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-e4",
+      "label": "Testing Suite",
+      "groupId": "group-engineering",
+      "x": 580,
+      "y": 250,
+      "width": 120,
+      "height": 60,
+      "color": "4A90E2",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-d1",
+      "label": "Brand Refresh",
+      "groupId": "group-design",
+      "x": 100,
+      "y": 400,
+      "width": 120,
+      "height": 60,
+      "color": "2DADC1",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-d2",
+      "label": "UI Components",
+      "groupId": "group-design",
+      "x": 260,
+      "y": 400,
+      "width": 120,
+      "height": 60,
+      "color": "2DADC1",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-d3",
+      "label": "Prototype Testing",
+      "groupId": "group-design",
+      "x": 420,
+      "y": 400,
+      "width": 120,
+      "height": 60,
+      "color": "2DADC1",
+      "status": "todo",
+      "description": ""
+    },
+    {
+      "id": "task-d4",
+      "label": "Design Handoff",
+      "groupId": "group-design",
+      "x": 580,
+      "y": 400,
+      "width": 120,
+      "height": 60,
+      "color": "2DADC1",
+      "status": "todo",
+      "description": ""
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-product",
+      "label": "Product",
+      "x": 50,
+      "y": 50,
+      "width": 700,
+      "height": 150,
+      "color": "534AB7"
+    },
+    {
+      "id": "group-engineering",
+      "label": "Engineering",
+      "x": 50,
+      "y": 200,
+      "width": 700,
+      "height": 150,
+      "color": "4A90E2"
+    },
+    {
+      "id": "group-design",
+      "label": "Design",
+      "x": 50,
+      "y": 350,
+      "width": 700,
+      "height": 150,
+      "color": "2DADC1"
+    }
+  ],
+  "connections": []
+}

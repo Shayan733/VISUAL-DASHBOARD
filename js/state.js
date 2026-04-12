@@ -10,6 +10,9 @@ const State = (() => {
     connections: [],
   };
 
+  // Read-only mode flag
+  let readOnly = false;
+
   // Subscribers for state changes
   const listeners = [];
 
@@ -397,6 +400,31 @@ const State = (() => {
     notify('loaded', state);
   }
 
+  /**
+   * Load state from JSON object
+   */
+  function loadFromJSON(jsonData) {
+    try {
+      state = {
+        canvas: jsonData.canvas || { offsetX: 0, offsetY: 0, zoom: 1 },
+        nodes: jsonData.nodes || [],
+        connections: jsonData.connections || [],
+      };
+      notify('loaded', state);
+      return true;
+    } catch (error) {
+      console.error('Failed to load JSON:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Export current state as JSON
+   */
+  function toJSON() {
+    return state;
+  }
+
   /* ── Events ── */
 
   function on(callback) {
@@ -434,11 +462,15 @@ const State = (() => {
     duplicateNodes,
     save,
     load,
+    loadFromJSON,
+    toJSON,
     exportJSON,
     importJSON,
     clearAll,
     replaceState,
     on,
     off,
+    get readOnly() { return readOnly; },
+    set readOnly(value) { readOnly = value; },
   };
 })();

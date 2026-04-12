@@ -20,6 +20,8 @@ const Selection = (() => {
    * Select a single node (clear others unless shift held)
    */
   function select(id, additive = false) {
+    if (State.readOnly) return; // Prevent selection in read-only mode
+
     if (!additive) {
       clearSelection();
     }
