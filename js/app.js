@@ -4,8 +4,57 @@
 
 const App = (() => {
 
-  function init() {
+  async function init() {
     console.log('🧠 Visual Dashboard — Initializing...');
+
+    // Check for read-only mode via URL hash (Phase 1)
+    const hash = window.location.hash;
+    if (hash && hash.includes('state=')) {
+      const encoded = hash.replace('#state=', '');
+      try {
+        const state = JSON.parse(decodeURIComponent(atob(encoded)));
+        State.loadFromJSON(state);
+        State.readOnly = true;
+        document.body.classList.add('read-only');
+        console.log('📖 Read-only mode enabled');
+
+        // Initialize UI for read-only
+        Canvas.init();
+        Selection.init();
+        Drag.init();
+        Toolbar.init();
+        ContextMenu.init();
+        Properties.init();
+        Keyboard.init();
+        Minimap.init();
+        CommandPalette.init();
+        State.on(onStateChange);
+        Canvas.container.addEventListener('dblclick', onCanvasDblClick);
+        Canvas.nodesLayer.addEventListener('click', onNodeClick);
+
+        NodeRenderer.renderAll();
+        ConnectionRenderer.renderAll();
+        if (window.showToast) {
+          showToast('Read-only mode. Export as PNG to download.', 'info');
+        }
+      } catch (e) {
+        console.error('Failed to decode state', e);
+      }
+      console.log('🚀 Visual Dashboard ready!');
+      return;
+    }
+
+    // Phase 2: Check authentication
+    await Auth.init();
+
+    // If no user after auth check, stop here (auth modal shown)
+    if (!State.user) {
+      console.log('Waiting for authentication...');
+      return;
+    }
+
+    // User is authenticated, initialize normal UI
+    console.log('✓ User authenticated:', State.user.email);
 
     // Initialize all modules
     Canvas.init();
@@ -18,50 +67,24 @@ const App = (() => {
     Minimap.init();
     CommandPalette.init();
     WelcomeModal.init();
+    Sidebar.init();
 
     // Listen for state changes
     State.on(onStateChange);
 
-    // Check for read-only mode via URL hash
-    const hash = window.location.hash;
-    if (hash && hash.includes('state=')) {
-      const encoded = hash.replace('#state=', '');
-      try {
-        const state = JSON.parse(decodeURIComponent(atob(encoded)));
-        State.loadFromJSON(state);
-        State.readOnly = true;
-        document.body.classList.add('read-only');
-        console.log('📖 Read-only mode enabled');
-        if (window.showToast) {
-          showToast('Read-only mode. Export as PNG to download.', 'info');
-        }
-        NodeRenderer.renderAll();
-        ConnectionRenderer.renderAll();
-      } catch (e) {
-        console.error('Failed to decode state', e);
-      }
-    } else {
-      // Normal startup: check localStorage
-      const saved = localStorage.getItem('vd_canvas');
-      const welcomed = localStorage.getItem('vd_welcomed');
-
-      if (!saved && !welcomed) {
-        WelcomeModal.show();
-      } else if (saved) {
-        State.loadFromJSON(JSON.parse(saved));
-        NodeRenderer.renderAll();
-        ConnectionRenderer.renderAll();
-      }
-
-      // Push initial state to history
-      History.push();
-    }
+    // Enable auto-save to cloud
+    Sync.enableAutoSave();
 
     // Double-click on canvas to create node
     Canvas.container.addEventListener('dblclick', onCanvasDblClick);
 
     // Open properties on node selection
     Canvas.nodesLayer.addEventListener('click', onNodeClick);
+
+    // Save immediately on page unload
+    window.addEventListener('beforeunload', async () => {
+      await Sync.saveCanvas();
+    });
 
     console.log('🚀 Visual Dashboard ready!');
   }

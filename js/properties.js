@@ -66,6 +66,14 @@ const Properties = (() => {
           <label>Status</label>
           <div class="props-status-list" id="props-statuses">${statusOptions}</div>
         </div>
+        <div class="props-field">
+          <label>Owner</label>
+          <input type="text" id="props-owner" value="${escapeAttr(node.owner || '')}" placeholder="@username">
+        </div>
+        <div class="props-field">
+          <label>Due Date</label>
+          <input type="date" id="props-due-date" value="${node.dueDate || ''}">
+        </div>
         <button class="props-delete-btn" id="props-delete">Delete ${node.type === 'group' ? 'Group' : 'Node'}</button>
       </div>
     `;
@@ -153,6 +161,22 @@ const Properties = (() => {
         // Update active state
         document.querySelectorAll('.props-status-option').forEach(o => o.classList.remove('active'));
         option.classList.add('active');
+      }
+    });
+
+    // Owner
+    const ownerInput = document.getElementById('props-owner');
+    ownerInput.addEventListener('input', () => {
+      if (currentNodeId) {
+        State.updateNode(currentNodeId, { owner: ownerInput.value });
+      }
+    });
+
+    // Due Date
+    const dueDateInput = document.getElementById('props-due-date');
+    dueDateInput.addEventListener('input', () => {
+      if (currentNodeId) {
+        State.updateNode(currentNodeId, { dueDate: dueDateInput.value });
       }
     });
 

@@ -13,6 +13,10 @@ const State = (() => {
   // Read-only mode flag
   let readOnly = false;
 
+  // User and canvas tracking for cloud sync
+  let user = null;
+  let currentCanvasId = null;
+
   // Subscribers for state changes
   const listeners = [];
 
@@ -383,7 +387,16 @@ const State = (() => {
   }
 
   /**
-   * Clear all state
+   * Clear all state (without pushing to history)
+   */
+  function clear() {
+    state.nodes = [];
+    state.connections = [];
+    notify('cleared', null);
+  }
+
+  /**
+   * Clear all state and push to history
    */
   function clearAll() {
     state.nodes = [];
@@ -466,11 +479,16 @@ const State = (() => {
     toJSON,
     exportJSON,
     importJSON,
+    clear,
     clearAll,
     replaceState,
     on,
     off,
     get readOnly() { return readOnly; },
     set readOnly(value) { readOnly = value; },
+    get user() { return user; },
+    set user(value) { user = value; },
+    get currentCanvasId() { return currentCanvasId; },
+    set currentCanvasId(value) { currentCanvasId = value; },
   };
 })();

@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="css/minimap.css">
   <link rel="stylesheet" href="css/commandPalette.css">
   <link rel="stylesheet" href="css/welcome-modal.css">
+  <link rel="stylesheet" href="css/sidebar.css">
 
   <!-- Favicon -->
   <link rel="icon"
@@ -35,6 +36,24 @@
 
 <body>
   <div id="app">
+
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h2>Canvases</h2>
+        <button id="create-canvas-btn" class="button button-small button-primary" title="Create new canvas">+ New</button>
+      </div>
+
+      <div id="canvas-list" class="canvas-list">
+        <!-- Populated by Sidebar.refresh() -->
+      </div>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="button button-small button-secondary">
+          Sign out
+        </button>
+      </div>
+    </div>
 
     <!-- ═══════════ FLOATING TOOLBOX ═══════════ -->
     <div id="toolbox">
@@ -171,6 +190,28 @@
       </div>
     </div>
 
+    <!-- ═══════════ AUTH MODAL ═══════════ -->
+    <div id="auth-modal" class="modal-overlay" style="display: flex; justify-content: center; align-items: center;">
+      <div class="modal-content" style="max-width: 400px;">
+        <h1 style="margin-bottom: 16px; font-size: 20px; color: var(--text-primary);">Sign in to Visual Dashboard</h1>
+
+        <button onclick="Auth.googleLogin()" class="button button-primary" style="width: 100%; margin-bottom: 16px;">
+          Google Sign In
+        </button>
+
+        <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">or</div>
+
+        <input type="email" id="magic-email" placeholder="your@email.com" style="width: 100%; padding: 8px 12px; margin-bottom: 8px; background: var(--node-bg-resting); border: 0.5px solid var(--node-border-rest); color: var(--text-primary); border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
+        <button onclick="Auth.magicLinkLogin(document.getElementById('magic-email').value)" class="button button-secondary" style="width: 100%;">
+          Send Magic Link
+        </button>
+
+        <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 16px;">
+          We'll create an account automatically on first sign in.
+        </p>
+      </div>
+    </div>
+
     <!-- ═══════════ WELCOME MODAL ═══════════ -->
     <div id="welcome-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content welcome-modal">
@@ -235,21 +276,38 @@
 
   <!-- ═══════════ SCRIPTS ═══════════ -->
   <!-- Load order matters: utilities first, then modules, then app last -->
+
+  <!-- Phase 2: Supabase, auth, sync -->
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/sync.js"></script>
+
+  <!-- Core utilities and state -->
   <script src="js/utils.js"></script>
   <script src="js/canvas.js"></script>
   <script src="js/history.js"></script>
   <script src="js/state.js"></script>
+
+  <!-- Canvas elements -->
   <script src="js/node.js"></script>
   <script src="js/selection.js"></script>
   <script src="js/connection.js"></script>
   <script src="js/drag.js"></script>
+
+  <!-- UI modules -->
   <script src="js/toolbar.js"></script>
   <script src="js/contextMenu.js"></script>
   <script src="js/properties.js"></script>
   <script src="js/keyboard.js"></script>
   <script src="js/minimap.js"></script>
   <script src="js/commandPalette.js"></script>
+  <script src="js/sidebar.js"></script>
+
+  <!-- External libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Modals and app -->
   <script src="js/welcome.js"></script>
   <script src="js/app.js"></script>
 </body>
