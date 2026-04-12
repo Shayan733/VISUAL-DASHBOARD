@@ -195,14 +195,14 @@
       <div class="modal-content" style="max-width: 400px;">
         <h1 style="margin-bottom: 16px; font-size: 20px; color: var(--text-primary);">Sign in to Visual Dashboard</h1>
 
-        <button onclick="Auth.googleLogin()" class="button button-primary" style="width: 100%; margin-bottom: 16px;">
+        <button onclick="Auth.googleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
           Google Sign In
         </button>
 
         <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">or</div>
 
         <input type="email" id="magic-email" placeholder="your@email.com" style="width: 100%; padding: 8px 12px; margin-bottom: 8px; background: var(--node-bg-resting); border: 0.5px solid var(--node-border-rest); color: var(--text-primary); border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
-        <button onclick="Auth.magicLinkLogin(document.getElementById('magic-email').value)" class="button button-secondary" style="width: 100%;">
+        <button onclick="Auth.magicLinkLogin(document.getElementById('magic-email').value)" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
           Send Magic Link
         </button>
 
