@@ -245,3 +245,60 @@ function cycleStatus(currentStatus) {
   const nextIdx = (idx + 1) % STATUSES.length;
   return STATUSES[nextIdx].key;
 }
+
+/**
+ * Show toast notification
+ */
+function showToast(message, type = 'info') {
+  let existing = document.getElementById('toast-container');
+  if (!existing) {
+    existing = document.createElement('div');
+    existing.id = 'toast-container';
+    existing.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    `;
+    document.body.appendChild(existing);
+  }
+
+  const toast = document.createElement('div');
+  const bgColor = type === 'error' ? '#ef4444' : type === 'success' ? '#34d399' : type === 'warning' ? '#fb923c' : '#818cf8';
+  const icon = type === 'error' ? '✕' : type === 'success' ? '✓' : type === 'warning' ? '⚠' : 'ℹ';
+
+  toast.style.cssText = `
+    background: ${bgColor};
+    color: white;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+  `;
+  toast.textContent = `${icon} ${message}`;
+  existing.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/* Add slideIn animation */
+if (!document.getElementById('toast-styles')) {
+  const style = document.createElement('style');
+  style.id = 'toast-styles';
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+}
