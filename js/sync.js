@@ -70,25 +70,35 @@ const Sync = (() => {
     try {
       const { data, error } = await SupabaseClient
         .from('canvases')
-        .select('*')
+        .select('id, name, state_json, updated_at')
         .eq('user_id', State.user.id)
         .order('updated_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (error || !data) {
+      if (error) {
+        console.error('Load canvas error:', error);
+        // Rate limited or no permission - create blank
+        await createCanvas('Untitled');
+        return;
+      }
+
+      if (!data || data.length === 0) {
         // No canvases yet, create blank
         await createCanvas('Untitled');
         return;
       }
 
-      State.currentCanvasId = data.id;
-      State.loadFromJSON(data.state_json || { nodes: [], connections: [] });
+      const canvas = data[0];
+      State.currentCanvasId = canvas.id;
+      State.loadFromJSON(canvas.state_json || { nodes: [], connections: [] });
       NodeRenderer.renderAll();
       ConnectionRenderer.renderAll();
     } catch (e) {
       console.error('Load most recent error:', e);
-      await createCanvas('Untitled');
+      // Silently create blank on error to avoid infinite loops
+      if (!State.currentCanvasId) {
+        await createCanvas('Untitled');
+      }
     }
   };
 
