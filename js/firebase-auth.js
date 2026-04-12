@@ -115,7 +115,7 @@ const FirebaseAuth = (() => {
     if (firebaseUser) {
       State.user = normalizeUser(firebaseUser);
       hideAuthModal();
-      await Sync.loadMostRecentCanvas();
+      // Canvas loading is handled by app.js after all modules are initialised
     } else {
       showAuthModal();
     }

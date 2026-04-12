@@ -75,6 +75,9 @@ const App = (() => {
     // Enable auto-save to cloud
     Sync.enableAutoSave();
 
+    // Load canvas now that all modules (Canvas, NodeRenderer, etc.) are ready
+    await Sync.loadMostRecentCanvas();
+
     // Double-click on canvas to create node
     Canvas.container.addEventListener('dblclick', onCanvasDblClick);
 
