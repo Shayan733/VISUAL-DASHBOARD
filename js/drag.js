@@ -33,6 +33,45 @@ const Drag = (() => {
     container.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
+
+    // ── File drag-and-drop onto nodes ──
+    container.addEventListener('dragover', (e) => {
+      if (!e.dataTransfer.types.includes('Files')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+
+      // Highlight the node under cursor
+      const nodeEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.canvas-node');
+      document.querySelectorAll('.canvas-node.drag-file-over').forEach(el => {
+        if (el !== nodeEl) el.classList.remove('drag-file-over');
+      });
+      if (nodeEl) nodeEl.classList.add('drag-file-over');
+    });
+
+    container.addEventListener('dragleave', (e) => {
+      if (!e.dataTransfer.types.includes('Files')) return;
+      // Only clear if we've left the container entirely
+      if (!container.contains(e.relatedTarget)) {
+        document.querySelectorAll('.canvas-node.drag-file-over').forEach(el => {
+          el.classList.remove('drag-file-over');
+        });
+      }
+    });
+
+    container.addEventListener('drop', (e) => {
+      if (!e.dataTransfer.files.length) return;
+      e.preventDefault();
+
+      document.querySelectorAll('.canvas-node.drag-file-over').forEach(el => {
+        el.classList.remove('drag-file-over');
+      });
+
+      const nodeEl = document.elementFromPoint(e.clientX, e.clientY)?.closest('.canvas-node');
+      if (nodeEl) {
+        const nodeId = nodeEl.dataset.id;
+        Attachments.handleNodeDrop(nodeId, e.dataTransfer.files);
+      }
+    });
   }
 
   function onMouseDown(e) {
