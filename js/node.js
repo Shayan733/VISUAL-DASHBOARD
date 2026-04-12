@@ -62,6 +62,14 @@ const NodeRenderer = (() => {
       <div class="node-description">
         <textarea placeholder="Add description...">${escapeHTML(node.description || '')}</textarea>
       </div>
+      <div class="node-footer" id="footer-${node.id}">
+        ${node.attachments && node.attachments.length > 0 ? `
+          <div class="attachment-count-badge" data-node-id="${node.id}">
+            ${Attachments.PAPERCLIP_SVG}
+            <span>${node.attachments.length}</span>
+          </div>
+        ` : ''}
+      </div>
     `;
   }
 
@@ -267,6 +275,18 @@ const NodeRenderer = (() => {
       }
     }
 
+    // Update attachment badge
+    const footer = el.querySelector('.node-footer');
+    if (footer && node.type !== 'group') {
+      const count = node.attachments ? node.attachments.length : 0;
+      footer.innerHTML = count > 0 ? `
+        <div class="attachment-count-badge" data-node-id="${node.id}">
+          ${Attachments.PAPERCLIP_SVG}
+          <span>${count}</span>
+        </div>
+      ` : '';
+    }
+
     // Update connected ports
     updatePortStates(el, node.id);
   }
@@ -339,6 +359,15 @@ const NodeRenderer = (() => {
         }
       });
     }
+
+    // Attachment badge click → open properties panel
+    el.addEventListener('click', (e) => {
+      const badge = e.target.closest('.attachment-count-badge');
+      if (badge) {
+        e.stopPropagation();
+        Properties.show(node.id);
+      }
+    });
 
     // Description textarea
     const descArea = el.querySelector('.node-description textarea');

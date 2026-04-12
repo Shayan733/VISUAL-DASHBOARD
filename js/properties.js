@@ -74,12 +74,16 @@ const Properties = (() => {
           <label>Due Date</label>
           <input type="date" id="props-due-date" value="${node.dueDate || ''}">
         </div>
+        ${Attachments.buildSectionHTML()}
         <button class="props-delete-btn" id="props-delete">Delete ${node.type === 'group' ? 'Group' : 'Node'}</button>
       </div>
     `;
 
+    panelEl.dataset.nodeId = nodeId;
     panelEl.classList.add('visible');
     bindEvents();
+    Attachments.renderPanel(nodeId);
+    Attachments.bindPanelEvents(nodeId);
   }
 
   /**

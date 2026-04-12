@@ -1,68 +1,77 @@
 /* ============================================
    VISUAL DASHBOARD — Design Tokens
-   Theme: "Deep Space" 🌌
+   Bible Section 3 — Visual Contract
+   All values here are canonical. Do not deviate
+   without updating the Bible first.
    ============================================ */
 
 :root {
   /* ── Canvas ── */
-  --canvas-bg: #0c0c14;
-  --grid-dot: rgba(255, 255, 255, 0.04);
-  --grid-dot-major: rgba(255, 255, 255, 0.08);
-  --grid-size: 20px;
+  --canvas-bg: #111111;
+  --grid-dot: #222222;
+  --grid-size: 22px;
 
   /* ── Surfaces ── */
-  --surface-1: #13131f;
-  --surface-2: #1a1a2e;
-  --surface-3: #222238;
-  --surface-4: #2a2a44;
+  --panel-bg: #181818;
+  --node-bg-resting: #1A1A1A;
+  --node-bg-hover: #202020;
+  --node-bg-selected: #222222;
+  --surface-3: #252525;
+  --surface-4: #2E2E2E;
 
-  /* ── Borders ── */
-  --border: rgba(255, 255, 255, 0.07);
-  --border-hover: rgba(255, 255, 255, 0.15);
-  --border-selected: #6366f1;
-  --border-connecting: #818cf8;
+  /* ── Borders ── (all 0.5px per bible) */
+  --border: #2A2A2A;
+  --border-hover: #444444;
+  --border-selected: #534AB7;
+  --border-focus: #534AB7;
+  --border-connecting: #534AB7;
 
   /* ── Text ── */
-  --text-1: #f1f5f9;
-  --text-2: #94a3b8;
-  --text-3: #475569;
-  --text-placeholder: #334155;
+  --text-primary: #E8E8E8;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --text-placeholder: #3A3A3A;
+  /* legacy aliases kept for compatibility */
+  --text-1: #E8E8E8;
+  --text-2: #888888;
+  --text-3: #555555;
 
   /* ── Accent / Primary ── */
-  --accent: #818cf8;
-  --accent-hover: #6366f1;
-  --accent-glow: rgba(129, 140, 248, 0.2);
-  --accent-glow-strong: rgba(129, 140, 248, 0.4);
+  --accent: #534AB7;
+  --accent-hover: #6258C4;
+  --accent-glow: rgba(83, 74, 183, 0.2);
+  --accent-glow-strong: rgba(83, 74, 183, 0.4);
 
   /* ── Node Color Palette ── */
-  --color-indigo: #818cf8;
+  --color-purple: #534AB7;
+  --color-indigo: #6366f1;
   --color-violet: #a78bfa;
-  --color-emerald: #34d399;
-  --color-amber: #fbbf24;
-  --color-rose: #fb7185;
+  --color-emerald: #10B981;
+  --color-amber: #F59E0B;
+  --color-rose: #EF4444;
   --color-cyan: #22d3ee;
   --color-orange: #fb923c;
   --color-slate: #64748b;
 
-  /* ── Status Colors ── */
-  --status-todo: #94a3b8;
-  --status-progress: #fb923c;
-  --status-done: #34d399;
-  --status-blocked: #fb7185;
+  /* ── Status Colors (bible Section 3.8) ── */
+  --status-todo: #444444;
+  --status-progress: #F59E0B;
+  --status-done: #10B981;
+  --status-blocked: #EF4444;
 
   /* ── Danger ── */
-  --danger: #ef4444;
+  --danger: #EF4444;
   --danger-hover: #dc2626;
 
   /* ── Shadows ── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.7);
   --shadow-glow: 0 0 20px var(--accent-glow);
-  --shadow-node: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
-  --shadow-node-hover: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-hover);
-  --shadow-node-selected: 0 0 0 2px var(--border-selected), 0 0 20px var(--accent-glow);
-  --shadow-node-dragging: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--border-selected);
+  --shadow-node: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 0.5px var(--border);
+  --shadow-node-hover: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 0.5px var(--border-hover);
+  --shadow-node-selected: 0 0 0 1.5px var(--border-selected), 0 0 20px var(--accent-glow);
+  --shadow-node-dragging: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 0 1.5px var(--border-selected);
 
   /* ── Spacing ── */
   --space-xs: 4px;
@@ -72,12 +81,25 @@
   --space-xl: 24px;
   --space-2xl: 32px;
 
-  /* ── Radii ── */
+  /* ── Radii (bible Section 3.5) ── */
+  --radius-panel: 11px;
+  --radius-node: 9px;
+  --radius-btn: 7px;
+  --radius-pill: 20px;
+  --radius-swatch: 5px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
   --radius-full: 9999px;
+
+  /* ── Geometry (bible Section 3.5) ── */
+  --border-weight: 0.5px;
+  --node-accent-bar-width: 3px;
+  --sidebar-width: 188px;
+  --properties-width: 214px;
+  --topbar-height: 42px;
+  --panel-header-height: 34px;
+  --toolbar-btn-size: 30px;
 
   /* ── Typography ── */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -106,4 +128,5 @@
   --z-context-menu: 600;
   --z-properties: 550;
   --z-modal: 700;
+  --z-attachment-tray: 620;
 }
