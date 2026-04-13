@@ -17,6 +17,51 @@
   overflow-y: auto;
   overflow-x: hidden;
   pointer-events: none;
+  transition: transform 250ms ease;
+}
+
+/* Sidebar collapsed state */
+.sidebar.collapsed {
+  transform: translateX(-100%);
+}
+
+/* Sidebar toggle tab */
+.sidebar-toggle-btn {
+  position: fixed;
+  left: 188px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 48px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  z-index: 101;
+  cursor: pointer;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 250ms ease, background 150ms ease, color 150ms ease;
+  padding: 0;
+}
+
+.sidebar-toggle-btn.collapsed {
+  left: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--surface-4);
+  color: var(--text-1);
+}
+
+.sidebar-toggle-btn svg {
+  transition: transform 250ms ease;
+}
+
+.sidebar-toggle-btn.collapsed svg {
+  transform: rotate(180deg);
 }
 
 .sidebar > * {
@@ -98,14 +143,79 @@
 }
 
 .sidebar-footer {
-  padding: 12px;
+  padding: 10px 12px;
   border-top: 1px solid var(--sidebar-border);
   margin-top: auto;
 }
 
-.sidebar-footer .button {
+/* ── User Profile Strip ── */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.user-avatar img {
   width: 100%;
-  font-size: 11px;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.signout-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm, 4px);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.signout-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
 }
 
 /* Create button styling */

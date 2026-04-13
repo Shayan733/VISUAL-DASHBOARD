@@ -3,6 +3,30 @@
    ============================================ */
 
 const Sidebar = (() => {
+  const updateUserInfo = () => {
+    const user = State.user;
+    if (!user) return;
+
+    const avatarEl = document.getElementById('user-avatar');
+    const nameEl   = document.getElementById('user-name');
+    const emailEl  = document.getElementById('user-email');
+
+    if (avatarEl) {
+      if (user.photoURL) {
+        avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
+      } else {
+        const initial = (user.displayName || user.email || '?')[0].toUpperCase();
+        avatarEl.textContent = initial;
+      }
+    }
+    if (nameEl) {
+      nameEl.textContent = user.displayName || user.email?.split('@')[0] || 'User';
+    }
+    if (emailEl) {
+      emailEl.textContent = user.email || '';
+    }
+  };
+
   const init = () => {
     const createBtn = document.getElementById('create-canvas-btn');
     const logoutBtn = document.getElementById('logout-btn');
@@ -20,6 +44,34 @@ const Sidebar = (() => {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
         await FirebaseAuth.logout();
+      });
+    }
+
+    updateUserInfo();
+
+    // Sidebar toggle
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    if (toggleBtn) {
+      // Restore saved collapsed state
+      const savedCollapsed = localStorage.getItem('vd-sidebar-collapsed') === 'true';
+      if (savedCollapsed) {
+        document.getElementById('sidebar').classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        document.documentElement.style.setProperty('--sidebar-w', '0px');
+      }
+
+      toggleBtn.addEventListener('click', () => {
+        const sidebar = document.getElementById('sidebar');
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        toggleBtn.classList.toggle('collapsed', isCollapsed);
+        localStorage.setItem('vd-sidebar-collapsed', isCollapsed);
+        // Update CSS variable so coords display and other elements adapt
+        document.documentElement.style.setProperty('--sidebar-w', isCollapsed ? '0px' : '188px');
+        // After the 250ms slide transition, redraw grid and connections
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+          if (typeof ConnectionRenderer !== 'undefined') ConnectionRenderer.renderAll();
+        }, 260);
       });
     }
 

@@ -330,6 +330,46 @@
   color: var(--accent);
 }
 
+/* ── Node Attachment Previews ── */
+.node-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 8px 8px;
+}
+
+.node-attachments:empty {
+  display: none;
+}
+
+.node-attachment-img {
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+  pointer-events: none;
+}
+
+.node-attachment-audio,
+.node-attachment-video {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
+  max-height: 120px;
+}
+
+.node-attachment-file {
+  font-size: 10px;
+  background: var(--surface-3, #1c1c1c);
+  color: var(--text-3, #9E9E9E);
+  padding: 3px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Resize Handle ── */
 .node-resize-handle {
   position: absolute;

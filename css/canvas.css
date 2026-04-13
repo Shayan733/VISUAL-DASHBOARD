@@ -13,6 +13,8 @@
 #canvas-container {
   position: absolute;
   inset: 0;
+  right: var(--props-w);
+  transition: right 250ms ease;
   overflow: hidden;
   cursor: grab;
   background-color: var(--canvas-bg);
@@ -103,7 +105,7 @@
 #coords-display {
   position: absolute;
   bottom: var(--space-lg);
-  left: var(--space-lg);
+  left: calc(var(--sidebar-w) + var(--space-lg));
   padding: var(--space-xs) var(--space-md);
   background: var(--surface-3);
   border: 1px solid var(--border);
