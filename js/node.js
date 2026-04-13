@@ -62,7 +62,27 @@ const NodeRenderer = (() => {
       <div class="node-description">
         <textarea placeholder="Add description...">${escapeHTML(node.description || '')}</textarea>
       </div>
+      <div class="node-attachments">${buildAttachmentsHTML(node.attachments)}</div>
     `;
+  }
+
+  /**
+   * Build HTML for attachment previews inside a node
+   */
+  function buildAttachmentsHTML(attachments) {
+    if (!attachments || attachments.length === 0) return '';
+    return attachments.map(att => {
+      const type = att.type || '';
+      if (type.startsWith('image/')) {
+        return `<img src="${att.dataUrl}" class="node-attachment-img" alt="${escapeHTML(att.name)}" draggable="false">`;
+      } else if (type.startsWith('audio/')) {
+        return `<audio controls class="node-attachment-audio" src="${att.dataUrl}"></audio>`;
+      } else if (type.startsWith('video/')) {
+        return `<video controls class="node-attachment-video" src="${att.dataUrl}"></video>`;
+      } else {
+        return `<div class="node-attachment-file">&#128196; ${escapeHTML(att.name)}</div>`;
+      }
+    }).join('');
   }
 
   /**
@@ -267,6 +287,15 @@ const NodeRenderer = (() => {
       }
     }
 
+    // Update attachments
+    const attachmentsEl = el.querySelector('.node-attachments');
+    if (attachmentsEl) {
+      const newHTML = buildAttachmentsHTML(node.attachments);
+      if (attachmentsEl.innerHTML !== newHTML) {
+        attachmentsEl.innerHTML = newHTML;
+      }
+    }
+
     // Update connected ports
     updatePortStates(el, node.id);
   }
@@ -349,6 +378,14 @@ const NodeRenderer = (() => {
       descArea.addEventListener('mousedown', (e) => e.stopPropagation());
       descArea.addEventListener('focus', (e) => e.stopPropagation());
     }
+
+    // Prevent canvas drag/zoom when interacting with attachment media
+    el.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.node-attachments')) e.stopPropagation();
+    }, true);
+    el.addEventListener('wheel', (e) => {
+      if (e.target.closest('.node-attachments')) e.stopPropagation();
+    }, { passive: false });
   }
 
   /**
@@ -397,6 +434,10 @@ const NodeRenderer = (() => {
     nodes.filter(n => n.type === 'node').forEach(n => renderNode(n));
     // Sticky notes on top
     nodes.filter(n => n.type === 'sticky').forEach(n => renderNode(n));
+
+    // Redraw connections after DOM settles — getPortPosition now reads live DOM
+    // heights so attachment images (which grow nodes) are automatically accounted for.
+    requestAnimationFrame(() => ConnectionRenderer.renderAll());
   }
 
   /**

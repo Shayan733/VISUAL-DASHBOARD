@@ -127,13 +127,22 @@ function generateBezierPath(x1, y1, x2, y2, sourcePort, targetPort) {
 }
 
 /**
- * Get the port position (x, y) for a node given the port direction
+ * Get the port position (x, y) for a node given the port direction.
+ * Always reads the actual rendered height from the DOM so that nodes
+ * expanded by attachment images (or any dynamic content) have accurate
+ * port positions — no state.height sync required.
  */
 function getPortPosition(node, port) {
   const x = node.x;
   const y = node.y;
   const w = node.width || 180;
-  const h = node.height || 60;
+
+  // Prefer live DOM height (captures image attachments, wrapping text, etc.)
+  let h = node.height || 60;
+  if (node.id && typeof Canvas !== 'undefined' && Canvas.nodesLayer) {
+    const el = Canvas.nodesLayer.querySelector(`[data-id="${node.id}"]`);
+    if (el) h = el.offsetHeight;
+  }
 
   switch (port) {
     case 'top':    return { x: x + w / 2, y: y };

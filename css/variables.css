@@ -5,16 +5,25 @@
 
 :root {
   /* ── Canvas ── */
-  --canvas-bg: #0c0c14;
-  --grid-dot: rgba(255, 255, 255, 0.04);
-  --grid-dot-major: rgba(255, 255, 255, 0.08);
+  --canvas-bg: #1e1e26;
+  --grid-dot: rgba(255, 255, 255, 0.05);
+  --grid-dot-major: rgba(255, 255, 255, 0.1);
   --grid-size: 20px;
 
   /* ── Surfaces ── */
-  --surface-1: #13131f;
-  --surface-2: #1a1a2e;
-  --surface-3: #222238;
-  --surface-4: #2a2a44;
+  --surface-1: #18181f;
+  --surface-2: #1e1e28;
+  --surface-3: #252532;
+  --surface-4: #2c2c3a;
+
+  /* ── Layout State ── */
+  --sidebar-w: 188px;
+  --props-w: 0px;
+
+  /* ── Sidebar ── */
+  --sidebar-bg: #0d0d12;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-props-bg: #0d0d12;
 
   /* ── Borders ── */
   --border: rgba(255, 255, 255, 0.07);
