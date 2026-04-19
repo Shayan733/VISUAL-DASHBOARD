@@ -230,17 +230,6 @@ const Sync = (() => {
     }
   };
 
-  /* ── Canvas metadata (name / color) ── */
-
-  const updateCanvasMeta = async (canvasId, updates) => {
-    if (!State.user) return;
-    try {
-      await canvasesCol().doc(canvasId).update(updates);
-    } catch (e) {
-      console.error('Update canvas meta error:', e);
-    }
-  };
-
   /* ── Snapshots ── */
 
   const saveSnapshot = async (name) => {
