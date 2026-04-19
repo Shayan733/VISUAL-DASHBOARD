@@ -5,9 +5,22 @@
 const Properties = (() => {
   let panelEl = null;
   let currentNodeId = null;
+  let canvasClickHandlerBound = false;
 
   function init() {
     panelEl = document.getElementById('properties-panel');
+
+    // Click outside closes the panel (backdrop-free).
+    const canvasContainer = document.getElementById('canvas-container');
+    if (canvasContainer && !canvasClickHandlerBound) {
+      canvasClickHandlerBound = true;
+      canvasContainer.addEventListener('click', (e) => {
+        if (!panelEl) return;
+        if (e.target.closest('.canvas-node')) return;
+        if (e.target.closest('#properties-panel')) return;
+        hide();
+      });
+    }
   }
 
   /**
@@ -80,7 +93,13 @@ const Properties = (() => {
     `;
 
     panelEl.dataset.nodeId = nodeId;
-    panelEl.classList.add('visible');
+    panelEl.classList.add('open');
+    // Redraw connections after the 200ms slide-in transition completes.
+    setTimeout(() => {
+      if (typeof ConnectionRenderer !== 'undefined') {
+        ConnectionRenderer.renderAll();
+      }
+    }, 210);
     bindEvents();
     Attachments.renderPanel(nodeId);
     Attachments.bindPanelEvents(nodeId);
@@ -90,8 +109,14 @@ const Properties = (() => {
    * Hide properties panel
    */
   function hide() {
-    panelEl.classList.remove('visible');
+    if (!panelEl) return;
+    panelEl.classList.remove('open');
     currentNodeId = null;
+    setTimeout(() => {
+      if (typeof ConnectionRenderer !== 'undefined') {
+        ConnectionRenderer.renderAll();
+      }
+    }, 210);
   }
 
   /**
