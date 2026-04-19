@@ -7,24 +7,30 @@
 
 :root {
   /* ── Canvas ── */
-  --canvas-bg: #111111;
+  /* Matches design references (Railway-like deep navy) */
+  --canvas-bg: #1e1e26;
   --grid-dot: #222222;
   --grid-size: 22px;
 
   /* ── Surfaces ── */
+  /* Canonical surfaces (used across nodes, groups, modals, palette) */
+  --surface-1: #16181F; /* cards / modal body */
+  --surface-2: #1C1E28; /* node background */
+  --surface-3: #252525; /* legacy mid surface */
+  --surface-4: #2E2E2E; /* legacy raised surface */
+
+  /* Legacy aliases kept for compatibility */
   --panel-bg: #181818;
   --node-bg-resting: #1A1A1A;
   --node-bg-hover: #202020;
   --node-bg-selected: #222222;
-  --surface-3: #252525;
-  --surface-4: #2E2E2E;
 
   /* ── Borders ── (all 0.5px per bible) */
   --border: #2A2A2A;
   --border-hover: #444444;
-  --border-selected: #534AB7;
-  --border-focus: #534AB7;
-  --border-connecting: #534AB7;
+  --border-selected: #A78BFA;
+  --border-focus: #A78BFA;
+  --border-connecting: #A78BFA;
 
   /* ── Text ── */
   --text-primary: #E8E8E8;
@@ -37,10 +43,17 @@
   --text-3: #555555;
 
   /* ── Accent / Primary ── */
-  --accent: #534AB7;
-  --accent-hover: #6258C4;
-  --accent-glow: rgba(83, 74, 183, 0.2);
-  --accent-glow-strong: rgba(83, 74, 183, 0.4);
+  --accent: #A78BFA;
+  --accent-hover: #B7A2FF;
+  --accent-glow: rgba(167, 139, 250, 0.2);
+  --accent-glow-strong: rgba(167, 139, 250, 0.4);
+
+  /* Legacy/compat tokens used by older CSS */
+  --accent-primary: var(--accent);
+  --sidebar-border: #1e1e1e;
+  --toolbar-button-bg: var(--surface-3);
+  --toolbar-button-hover: var(--surface-4);
+  --node-border-rest: var(--border);
 
   /* ── Node Color Palette ── */
   --color-purple: #534AB7;
