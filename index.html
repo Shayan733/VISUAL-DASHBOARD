@@ -36,17 +36,16 @@
 </head>
 
 <body>
-  <div id="app">
-
-    <!-- ═══════════ SIDEBAR TOGGLE ═══════════ -->
-    <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Toggle sidebar">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-    </button>
-
+  <div id="app-shell">
     <!-- ═══════════ SIDEBAR ═══════════ -->
     <div id="sidebar" class="sidebar">
+      <!-- ═══════════ SIDEBAR TOGGLE ═══════════ -->
+      <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Toggle sidebar">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
       <div class="sidebar-header">
         <h2>Canvases</h2>
         <button id="create-canvas-btn" class="button button-small button-primary" title="Create new canvas">+ New</button>
@@ -74,105 +73,105 @@
       </div>
     </div>
 
-    <!-- ═══════════ FLOATING TOOLBOX ═══════════ -->
-    <div id="toolbox">
-      <!-- Drag handle + brand -->
-      <div class="toolbox-header" id="toolbox-drag-handle">
-        <div class="toolbox-brand">
-          <div class="toolbox-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-            </svg>
-          </div>
-          <span class="toolbox-title">VD</span>
-        </div>
-        <button class="toolbox-close-btn" id="toolbox-close" title="Close toolbox">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Create -->
-      <div class="toolbox-section">
-        <button class="tb-btn primary" id="btn-add-node" title="Add Node (double-click canvas)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-add-group" title="Add Group">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3" stroke-dasharray="4 2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-add-sticky" title="Add Sticky Note">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><polyline points="14 2 14 8 20 8"/><path d="M20 14l-6 6h6v-6z"/></svg>
-        </button>
-      </div>
-
-      <div class="toolbox-divider"></div>
-
-      <!-- Edit -->
-      <div class="toolbox-section">
-        <button class="tb-btn danger" id="btn-delete" title="Delete selected (Del)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
-      </div>
-
-      <div class="toolbox-divider"></div>
-
-      <!-- History -->
-      <div class="toolbox-section">
-        <button class="tb-btn" id="btn-undo" title="Undo (⌘Z)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-redo" title="Redo (⌘⇧Z)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
-        </button>
-      </div>
-
-      <div class="toolbox-divider"></div>
-
-      <!-- View -->
-      <div class="toolbox-section">
-        <button class="tb-btn" id="btn-zoom-in" title="Zoom In">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-zoom-out" title="Zoom Out">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-fit-view" title="Fit View">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-        </button>
-      </div>
-
-      <div class="toolbox-divider"></div>
-
-      <!-- File -->
-      <div class="toolbox-section">
-        <button class="tb-btn" id="btn-save" title="Save (⌘S)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-export" title="Export JSON">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-import" title="Import JSON">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-export-png" title="Export PNG">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-        <button class="tb-btn" id="btn-share" title="Share Canvas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        </button>
-        <button class="tb-btn danger" id="btn-clear" title="Clear Canvas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        </button>
-      </div>
-
-      <!-- Hidden file input for import -->
-      <input type="file" id="import-file-input" accept=".json">
-    </div>
-
     <!-- ═══════════ CANVAS ═══════════ -->
     <div id="canvas-container">
+      <!-- ═══════════ FLOATING TOOLBOX ═══════════ -->
+      <div id="toolbox">
+        <!-- Drag handle + brand -->
+        <div class="toolbox-header" id="toolbox-drag-handle">
+          <div class="toolbox-brand">
+            <div class="toolbox-logo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+              </svg>
+            </div>
+            <span class="toolbox-title">VD</span>
+          </div>
+          <button class="toolbox-close-btn" id="toolbox-close" title="Close toolbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Create -->
+        <div class="toolbox-section">
+          <button class="tb-btn primary" id="btn-add-node" title="Add Node (double-click canvas)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-add-group" title="Add Group">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3" stroke-dasharray="4 2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-add-sticky" title="Add Sticky Note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><polyline points="14 2 14 8 20 8"/><path d="M20 14l-6 6h6v-6z"/></svg>
+          </button>
+        </div>
+
+        <div class="toolbox-divider"></div>
+
+        <!-- Edit -->
+        <div class="toolbox-section">
+          <button class="tb-btn danger" id="btn-delete" title="Delete selected (Del)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+
+        <div class="toolbox-divider"></div>
+
+        <!-- History -->
+        <div class="toolbox-section">
+          <button class="tb-btn" id="btn-undo" title="Undo (⌘Z)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-redo" title="Redo (⌘⇧Z)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
+          </button>
+        </div>
+
+        <div class="toolbox-divider"></div>
+
+        <!-- View -->
+        <div class="toolbox-section">
+          <button class="tb-btn" id="btn-zoom-in" title="Zoom In">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-zoom-out" title="Zoom Out">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-fit-view" title="Fit View">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+        </div>
+
+        <div class="toolbox-divider"></div>
+
+        <!-- File -->
+        <div class="toolbox-section">
+          <button class="tb-btn" id="btn-save" title="Save (⌘S)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-export" title="Export JSON">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-import" title="Import JSON">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-export-png" title="Export PNG">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="tb-btn" id="btn-share" title="Share Canvas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button class="tb-btn danger" id="btn-clear" title="Clear Canvas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </button>
+        </div>
+
+        <!-- Hidden file input for import -->
+        <input type="file" id="import-file-input" accept=".json">
+      </div>
+
       <!-- Grid layer (HTML Canvas for performance) -->
       <canvas id="canvas-grid"></canvas>
 
@@ -208,90 +207,91 @@
 
     <!-- ═══════════ PROPERTIES PANEL ═══════════ -->
     <div id="properties-panel"></div>
-
-    <!-- ═══════════ AUTH MODAL ═══════════ -->
-    <div id="auth-modal" class="modal-overlay" style="display: flex; justify-content: center; align-items: center;">
-      <div class="modal-content" style="max-width: 400px;">
-        <h1 style="margin-bottom: 16px; font-size: 20px; color: var(--text-primary);">Sign in to Visual Dashboard</h1>
-
-        <button onclick="FirebaseAuth.googleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
-          Google Sign In
-        </button>
-
-        <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">or</div>
-
-        <input type="email" id="magic-email" placeholder="your@email.com" style="width: 100%; padding: 8px 12px; margin-bottom: 8px; background: var(--node-bg-resting); border: 0.5px solid var(--node-border-rest); color: var(--text-primary); border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
-        <button onclick="FirebaseAuth.magicLinkLogin(document.getElementById('magic-email').value)" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
-          Send Magic Link
-        </button>
-
-        <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 16px;">
-          We'll create an account automatically on first sign in.
-        </p>
-      </div>
-    </div>
-
-    <!-- ═══════════ WELCOME MODAL ═══════════ -->
-    <div id="welcome-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-content welcome-modal">
-        <div class="modal-header">
-          <h1>Welcome to Visual Dashboard</h1>
-          <p>Map any process, any project, any system.</p>
-        </div>
-
-        <div class="templates-grid">
-          <div class="template-card" data-template="workflow">
-            <div class="template-icon">⚙️</div>
-            <h3>Workflow</h3>
-            <p>Release processes, CI/CD pipelines, team workflows</p>
-            <button class="btn btn-primary">Use Template</button>
-          </div>
-
-          <div class="template-card" data-template="planning">
-            <div class="template-icon">📋</div>
-            <h3>Planning</h3>
-            <p>Q1 roadmap, sprint planning, milestones</p>
-            <button class="btn btn-primary">Use Template</button>
-          </div>
-
-          <div class="template-card" data-template="system">
-            <div class="template-icon">🏗️</div>
-            <h3>System</h3>
-            <p>Architecture diagrams, data flows, integrations</p>
-            <button class="btn btn-primary">Use Template</button>
-          </div>
-        </div>
-
-        <div class="modal-divider"><span>or</span></div>
-
-        <button id="start-blank-btn" class="btn btn-secondary">
-          Start with blank canvas
-        </button>
-      </div>
-    </div>
-
-    <!-- ═══════════ CONTEXT MENU ═══════════ -->
-    <div id="context-menu"></div>
-
-    <!-- ═══════════ COMMAND PALETTE ═══════════ -->
-    <div id="command-palette" class="hidden">
-      <div class="cp-container">
-        <div class="cp-search-row">
-          <svg class="cp-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="text" id="cp-input" placeholder="Search node types..." autocomplete="off" spellcheck="false">
-        </div>
-        <div class="cp-list" id="cp-list"></div>
-        <div class="cp-footer">
-          <span class="cp-hint"><kbd>↑↓</kbd> navigate</span>
-          <span class="cp-hint"><kbd>↵</kbd> select</span>
-          <span class="cp-hint"><kbd>Esc</kbd> close</span>
-        </div>
-      </div>
-    </div>
-
   </div>
+
+  <!-- These live OUTSIDE #app-shell, directly on body -->
+
+  <!-- ═══════════ AUTH MODAL ═══════════ -->
+  <div id="auth-modal" class="modal-overlay" style="display: flex; justify-content: center; align-items: center;">
+    <div class="modal-content" style="max-width: 400px;">
+      <h1 style="margin-bottom: 16px; font-size: 20px; color: var(--text-primary);">Sign in to Visual Dashboard</h1>
+
+      <button onclick="FirebaseAuth.googleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
+        Google Sign In
+      </button>
+
+      <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">or</div>
+
+      <input type="email" id="magic-email" placeholder="your@email.com" style="width: 100%; padding: 8px 12px; margin-bottom: 8px; background: var(--node-bg-resting); border: 0.5px solid var(--node-border-rest); color: var(--text-primary); border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
+      <button onclick="FirebaseAuth.magicLinkLogin(document.getElementById('magic-email').value)" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
+        Send Magic Link
+      </button>
+
+      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 16px;">
+        We'll create an account automatically on first sign in.
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══════════ WELCOME MODAL ═══════════ -->
+  <div id="welcome-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content welcome-modal">
+      <div class="modal-header">
+        <h1>Welcome to Visual Dashboard</h1>
+        <p>Map any process, any project, any system.</p>
+      </div>
+
+      <div class="templates-grid">
+        <div class="template-card" data-template="workflow">
+          <div class="template-icon">⚙️</div>
+          <h3>Workflow</h3>
+          <p>Release processes, CI/CD pipelines, team workflows</p>
+          <button class="btn btn-primary">Use Template</button>
+        </div>
+
+        <div class="template-card" data-template="planning">
+          <div class="template-icon">📋</div>
+          <h3>Planning</h3>
+          <p>Q1 roadmap, sprint planning, milestones</p>
+          <button class="btn btn-primary">Use Template</button>
+        </div>
+
+        <div class="template-card" data-template="system">
+          <div class="template-icon">🏗️</div>
+          <h3>System</h3>
+          <p>Architecture diagrams, data flows, integrations</p>
+          <button class="btn btn-primary">Use Template</button>
+        </div>
+      </div>
+
+      <div class="modal-divider"><span>or</span></div>
+
+      <button id="start-blank-btn" class="btn btn-secondary">
+        Start with blank canvas
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════ COMMAND PALETTE ═══════════ -->
+  <div id="command-palette" class="hidden">
+    <div class="cp-container">
+      <div class="cp-search-row">
+        <svg class="cp-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="cp-input" placeholder="Search node types..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="cp-list" id="cp-list"></div>
+      <div class="cp-footer">
+        <span class="cp-hint"><kbd>↑↓</kbd> navigate</span>
+        <span class="cp-hint"><kbd>↵</kbd> select</span>
+        <span class="cp-hint"><kbd>Esc</kbd> close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CONTEXT MENU ═══════════ -->
+  <div id="context-menu"></div>
 
   <!-- ═══════════ SCRIPTS ═══════════ -->
   <!-- Load order matters: utilities first, then modules, then app last -->
