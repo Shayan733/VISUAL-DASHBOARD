@@ -2,70 +2,71 @@
    Sidebar — Canvas list and navigation
    ============================================ */
 
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
+/* CONFLICT REMOVED: position:fixed; left:0; top:0; height:100vh; pointer-events:none; transform transition */
+/* REASON: sidebar is now a flex sibling inside #app-shell — position:relative, width-only collapse */
+#sidebar {
   width: 188px;
-  height: 100vh;
-  background: var(--sidebar-props-bg);
-  border-right: 1px solid var(--sidebar-border);
+  min-width: 188px;
+  flex-shrink: 0;
+  position: relative;        /* NEVER fixed or absolute */
+  z-index: 100;
+  background: #0b0d12;
+  border-right: 0.5px solid #1e1e1e;
+  transition: width 200ms ease, min-width 200ms ease;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 16px 0;
-  z-index: 100;
-  overflow-y: auto;
-  overflow-x: hidden;
-  pointer-events: none;
-  transition: transform 250ms ease;
 }
 
-/* Sidebar collapsed state */
-.sidebar.collapsed {
-  transform: translateX(-100%);
+/* Sidebar collapsed state — width only, never hidden */
+/* CONFLICT REMOVED: transform:translateX(-100%) */
+#sidebar.collapsed {
+  width: 48px;
+  min-width: 48px;
 }
 
-/* Sidebar toggle tab */
+/* Toggle button — lives INSIDE sidebar, at the bottom */
+/* CONFLICT REMOVED: position:fixed; left:188px; top:50%; transform:translateY(-50%); transition:left */
+/* REASON: button is contained in the flex column, not floating on viewport */
 .sidebar-toggle-btn {
-  position: fixed;
-  left: 188px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 48px;
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  border-left: none;
-  border-radius: 0 6px 6px 0;
-  z-index: 101;
+  padding: 8px 12px;
   cursor: pointer;
-  color: var(--text-3);
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: left 250ms ease, background 150ms ease, color 150ms ease;
-  padding: 0;
-}
-
-.sidebar-toggle-btn.collapsed {
-  left: 0;
+  color: #444;
+  background: none;
+  border: none;
+  flex-shrink: 0;
+  transition: color 100ms ease;
 }
 
 .sidebar-toggle-btn:hover {
-  background: var(--surface-4);
-  color: var(--text-1);
+  color: #888;
 }
 
 .sidebar-toggle-btn svg {
-  transition: transform 250ms ease;
+  transition: transform 200ms ease;
+  flex-shrink: 0;
 }
 
-.sidebar-toggle-btn.collapsed svg {
+/* Chevron rotates when sidebar is collapsed */
+#sidebar.collapsed .sidebar-toggle-btn svg {
   transform: rotate(180deg);
 }
 
-.sidebar > * {
-  pointer-events: auto;
+/* Hide text labels in collapsed state — dots stay visible */
+#sidebar.collapsed .canvas-name,
+#sidebar.collapsed .canvas-time,
+#sidebar.collapsed .user-info,
+#sidebar.collapsed .user-name,
+#sidebar.collapsed .user-email,
+#sidebar.collapsed .sidebar-header h2,
+#sidebar.collapsed #create-canvas-btn {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 150ms ease, width 150ms ease;
 }
 
 .sidebar-header {
@@ -100,19 +101,32 @@
   padding: 8px 8px;
   margin-bottom: 4px;
   background: transparent;
-  border-radius: 4px;
-  border-left: 2px solid transparent;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease;
+  position: relative;
 }
 
 .canvas-item:hover {
-  background: var(--node-bg-hover);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .canvas-item.active {
-  background: #181826;
-  border-left-color: var(--accent-primary);
+  background: rgba(167, 139, 250, 0.08);
+}
+
+/* Round indicator dot for active canvas */
+.canvas-item.active::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent, #a78bfa);
+  flex-shrink: 0;
 }
 
 .canvas-dot {
@@ -253,10 +267,11 @@
   color: var(--text-primary);
 }
 
-/* Responsive */
+/* Responsive — collapse to icon-only on small screens, never hidden */
 @media (max-width: 768px) {
-  .sidebar {
-    display: none;
+  #sidebar {
+    width: 48px;
+    min-width: 48px;
   }
 }
 

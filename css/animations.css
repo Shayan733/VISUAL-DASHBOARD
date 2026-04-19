@@ -35,10 +35,10 @@
   pointer-events: none;
 }
 
-/* ── Selection pulse ── */
+/* ── Selection pulse — uses per-node --node-color so ring matches the node's own colour ── */
 @keyframes selectionPulse {
-  0%, 100% { box-shadow: var(--shadow-node-selected); }
-  50% { box-shadow: 0 0 0 2px var(--border-selected), 0 0 30px var(--accent-glow-strong); }
+  0%, 100% { box-shadow: 0 0 0 2px var(--node-color, var(--border-selected)), 0 4px 20px rgba(0,0,0,0.55); }
+  50%       { box-shadow: 0 0 0 3px var(--node-color, var(--border-selected)), 0 0 28px var(--node-color, var(--accent-glow-strong)); }
 }
 
 .canvas-node.selected {

@@ -2,23 +2,28 @@
    Properties Panel Styling (Right Sidebar)
    ============================================ */
 
+/* CONFLICT REMOVED: position:fixed; top:0; right:0; height:100vh; display:none; animation:slideInRight */
+/* REASON: panel is a flex sibling in #app-shell — translateX hides it, clipped by shell overflow:hidden */
 #properties-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 280px;
-  height: 100vh;
-  background: var(--surface-2);
-  border-left: 1px solid var(--border);
-  z-index: var(--z-properties);
-  display: none;
-  flex-direction: column;
+  width: 214px;
+  min-width: 214px;
+  flex-shrink: 0;
+  position: relative;        /* NEVER fixed or absolute */
+  z-index: 100;
+  background: #0d0f16;
+  border-left: 0.5px solid #1e1e1e;
+  transform: translateX(214px);   /* hidden: shifted right, clipped by shell overflow */
+  margin-right: -214px;           /* CRITICAL: cancel flex space so canvas is full-width when hidden */
+  transition: transform 200ms ease, margin-right 200ms ease;
   overflow-y: auto;
-  animation: slideInRight 0.25s ease-out;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-#properties-panel.visible {
-  display: flex;
+#properties-panel.open {
+  transform: translateX(0);
+  margin-right: 0;  /* restore flex space — canvas narrows by 214px when panel opens */
 }
 
 /* ── Panel Header ── */

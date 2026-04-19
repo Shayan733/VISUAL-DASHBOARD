@@ -304,6 +304,21 @@ const Sync = (() => {
     });
   };
 
+  const updateCanvasMeta = async (canvasId, fields) => {
+    if (!State.user || !window.SupabaseClient) return;
+    try {
+      const { error } = await SupabaseClient
+        .from('canvases')
+        .update(fields)
+        .eq('id', canvasId)
+        .eq('user_id', State.user.id);
+      if (error) { showToast('Failed to update canvas', 'error'); return; }
+      Sidebar.refresh();
+    } catch (e) {
+      showToast('Failed to update canvas', 'error');
+    }
+  };
+
   return {
     loadCanvas,
     saveCanvas,

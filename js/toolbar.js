@@ -40,11 +40,12 @@ const Toolbar = (() => {
       e.target.value = '';
     });
 
-    // ── Dragging ──
-    initDrag();
+    // ── Show-toolbox button ──
+    const showBtn = document.getElementById('toolbox-show-btn');
+    if (showBtn) showBtn.addEventListener('click', show);
 
-    // ── Restore saved position ──
-    restorePosition();
+    // ── Restore visibility state ──
+    restoreVisibility();
   }
 
   /* ── Actions ── */
@@ -182,23 +183,16 @@ const Toolbar = (() => {
   function hide() {
     const toolbox = document.getElementById('toolbox');
     toolbox.classList.add('hidden');
+    const showBtn = document.getElementById('toolbox-show-btn');
+    if (showBtn) showBtn.classList.add('visible');
     localStorage.setItem('toolbox-visible', 'false');
   }
 
   function show() {
     const toolbox = document.getElementById('toolbox');
     toolbox.classList.remove('hidden');
-    // Snap back to left-center default if no saved position
-    const saved = getSavedPosition();
-    if (!saved) {
-      toolbox.style.left = '16px';
-      toolbox.style.top = '';
-      toolbox.style.transform = 'translateY(-50%)';
-      // Apply after render so CSS centering kicks in
-      requestAnimationFrame(() => {
-        toolbox.style.top = '50%';
-      });
-    }
+    const showBtn = document.getElementById('toolbox-show-btn');
+    if (showBtn) showBtn.classList.remove('visible');
     localStorage.setItem('toolbox-visible', 'true');
   }
 
@@ -206,84 +200,18 @@ const Toolbar = (() => {
     return !document.getElementById('toolbox').classList.contains('hidden');
   }
 
-  /* ── Drag ── */
-  function initDrag() {
-    const toolbox = document.getElementById('toolbox');
-    const handle  = document.getElementById('toolbox-drag-handle');
 
-    let dragging = false;
-    let startX = 0, startY = 0;
-    let startLeft = 0, startTop = 0;
-
-    handle.addEventListener('mousedown', (e) => {
-      // Don't start drag from the close button
-      if (e.target.closest('.toolbox-close-btn')) return;
-      e.preventDefault();
-
-      dragging = true;
-      const rect = toolbox.getBoundingClientRect();
-
-      // Freeze current position absolutely so we can drag freely
-      toolbox.style.left = rect.left + 'px';
-      toolbox.style.top  = rect.top  + 'px';
-      toolbox.style.transform = 'none';
-      toolbox.classList.add('is-dragging');
-
-      startX = e.clientX;
-      startY = e.clientY;
-      startLeft = rect.left;
-      startTop  = rect.top;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!dragging) return;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
-      const newLeft = Math.max(0, Math.min(window.innerWidth  - toolbox.offsetWidth,  startLeft + dx));
-      const newTop  = Math.max(0, Math.min(window.innerHeight - toolbox.offsetHeight, startTop  + dy));
-
-      toolbox.style.left = newLeft + 'px';
-      toolbox.style.top  = newTop  + 'px';
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (!dragging) return;
-      dragging = false;
-      toolbox.classList.remove('is-dragging');
-
-      // Save position
-      savePosition(parseInt(toolbox.style.left), parseInt(toolbox.style.top));
-    });
-  }
-
-  function savePosition(left, top) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ left, top }));
-  }
-
-  function getSavedPosition() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
-  }
-
-  function restorePosition() {
-    const toolbox = document.getElementById('toolbox');
-
-    // Restore visibility
+  function restoreVisibility() {
+    // Toolbox position is always CSS-controlled (bottom-center). Never set inline position.
+    // Only restore the hidden/visible state.
     const visible = localStorage.getItem('toolbox-visible');
     if (visible === 'false') {
-      toolbox.classList.add('hidden');
+      document.getElementById('toolbox').classList.add('hidden');
+      const showBtn = document.getElementById('toolbox-show-btn');
+      if (showBtn) showBtn.classList.add('visible');
     }
-
-    // Restore position
-    const pos = getSavedPosition();
-    if (pos) {
-      toolbox.style.left = pos.left + 'px';
-      toolbox.style.top  = pos.top  + 'px';
-      toolbox.style.transform = 'none';
-    }
+    // Clear any stale saved position from the old draggable era
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   /* ── Save indicator ── */

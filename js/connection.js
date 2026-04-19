@@ -82,12 +82,14 @@ const ConnectionRenderer = (() => {
     group.appendChild(hitArea);
 
     // Main path
+    const connColor = sourceNode.color || 'var(--accent)';
+    const markerId = ensureColoredArrowMarker(svg, connColor, conn.id);
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.classList.add('connection-path');
     if (selectedConnectionId === conn.id) path.classList.add('selected');
     path.setAttribute('d', pathData);
-    path.setAttribute('marker-end', 'url(#arrow-marker)');
-    path.style.stroke = sourceNode.color || 'var(--accent)';
+    path.setAttribute('marker-end', `url(#${markerId})`);
+    path.style.stroke = connColor;
     group.appendChild(path);
 
     // Animated flow dots
@@ -145,20 +147,38 @@ const ConnectionRenderer = (() => {
   }
 
   /**
-   * Ensure SVG defs has arrow marker
+   * Ensure SVG has a <defs> block, clearing stale per-connection markers each render
    */
   function ensureArrowMarker(svg) {
-    if (svg.querySelector('#arrow-marker')) return;
-
+    // Remove old defs so stale colored markers don't accumulate
+    const oldDefs = svg.querySelector('defs');
+    if (oldDefs) oldDefs.remove();
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    defs.innerHTML = `
-      <marker id="arrow-marker" viewBox="0 0 10 10" refX="10" refY="5"
-              markerWidth="8" markerHeight="8" orient="auto-start-reverse"
-              markerUnits="strokeWidth">
-        <path d="M 0 0 L 10 5 L 0 10 z" class="connection-arrow" fill="var(--accent)" />
-      </marker>
-    `;
     svg.insertBefore(defs, svg.firstChild);
+  }
+
+  /**
+   * Create a colored arrow marker for a specific connection and return its id.
+   * Uses a sanitized color string as part of the id so colors are deduplicated.
+   */
+  function ensureColoredArrowMarker(svg, color, connId) {
+    const defs = svg.querySelector('defs');
+    const markerId = `arrow-${connId}`;
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    marker.setAttribute('id', markerId);
+    marker.setAttribute('viewBox', '0 0 10 10');
+    marker.setAttribute('refX', '10');
+    marker.setAttribute('refY', '5');
+    marker.setAttribute('markerWidth', '8');
+    marker.setAttribute('markerHeight', '8');
+    marker.setAttribute('orient', 'auto-start-reverse');
+    marker.setAttribute('markerUnits', 'strokeWidth');
+    const arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+    arrowPath.setAttribute('fill', color);
+    marker.appendChild(arrowPath);
+    defs.appendChild(marker);
+    return markerId;
   }
 
   /**

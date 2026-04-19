@@ -14,14 +14,14 @@
 }
 
 .canvas-node.group-node:hover {
-  border-color: var(--border-hover);
-  box-shadow: 0 0 0 1px var(--border-hover);
+  border-color: var(--node-color, var(--border-hover));
+  box-shadow: 0 0 0 1px var(--node-color, var(--border-hover));
 }
 
 .canvas-node.group-node.selected {
-  border-color: var(--border-selected);
+  border-color: var(--node-color, var(--border-selected));
   border-style: solid;
-  box-shadow: 0 0 0 2px var(--border-selected), 0 0 30px var(--accent-glow);
+  box-shadow: 0 0 0 2px var(--node-color, var(--border-selected)), 0 0 30px rgba(0,0,0,0.4);
 }
 
 /* ── Group Header ── */

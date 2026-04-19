@@ -45,7 +45,6 @@ const Canvas = (() => {
 
     // Set up grid canvas
     gridCtx = gridCanvas.getContext('2d');
-    resizeGrid();
 
     // Event listeners
     container.addEventListener('mousedown', onMouseDown);
@@ -59,16 +58,36 @@ const Canvas = (() => {
     container.addEventListener('touchmove', onTouchMove, { passive: false });
     container.addEventListener('touchend', onTouchEnd);
 
-    // Resize handler
+    // Resize handler — window resize
     window.addEventListener('resize', debounce(resizeGrid, 100));
+
+    // Observer A: no debounce — keeps SVG viewBox in sync on EVERY frame of the
+    // panel open/close transition so connections never appear shifted mid-animation.
+    const transformObserver = new ResizeObserver(() => {
+      resizeGrid();
+      updateTransform();
+    });
+    transformObserver.observe(container);
+
+    // Observer B: debounced 260ms — redraws connections once after the transition
+    // finishes. Expensive operation; must not run every animation frame.
+    const connectionObserver = new ResizeObserver(debounce(() => {
+      if (typeof ConnectionRenderer !== 'undefined') {
+        ConnectionRenderer.renderAll();
+      }
+    }, 260));
+    connectionObserver.observe(container);
 
     // Space key for pan
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
 
-    // Initial render
-    drawGrid();
-    updateTransform();
+    // Defer initial render — flex layout must settle before reading clientWidth/clientHeight
+    // Without this, resizeGrid() reads 0 and SVG viewBox becomes "0 0 0 0"
+    requestAnimationFrame(() => {
+      resizeGrid();       // sets grid canvas size + draws grid
+      updateTransform();  // sets SVG viewBox and nodes-layer transform
+    });
   }
 
   /**

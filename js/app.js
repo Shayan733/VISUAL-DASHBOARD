@@ -7,6 +7,19 @@ const App = (() => {
   async function init() {
     console.log('🧠 Visual Dashboard — Initializing...');
 
+    // Initialize core UI modules FIRST — before any auth or data loading.
+    // CRITICAL: FirebaseAuth.init() calls Sync.loadMostRecentCanvas() which calls
+    // NodeRenderer.renderAll(). Canvas.nodesLayer must be set before that happens.
+    Canvas.init();
+    Selection.init();
+    Drag.init();
+    Toolbar.init();
+    ContextMenu.init();
+    Properties.init();
+    Keyboard.init();
+    Minimap.init();
+    CommandPalette.init();
+
     // Check for read-only mode via URL hash (Phase 1)
     const hash = window.location.hash;
     if (hash && hash.includes('state=')) {
@@ -18,16 +31,6 @@ const App = (() => {
         document.body.classList.add('read-only');
         console.log('📖 Read-only mode enabled');
 
-        // Initialize UI for read-only
-        Canvas.init();
-        Selection.init();
-        Drag.init();
-        Toolbar.init();
-        ContextMenu.init();
-        Properties.init();
-        Keyboard.init();
-        Minimap.init();
-        CommandPalette.init();
         State.on(onStateChange);
         Canvas.container.addEventListener('dblclick', onCanvasDblClick);
         Canvas.nodesLayer.addEventListener('click', onNodeClick);
@@ -44,7 +47,7 @@ const App = (() => {
       return;
     }
 
-    // Phase 2: Check authentication (Firebase)
+    // Phase 2: Check authentication (Firebase) — also loads the most recent canvas
     await FirebaseAuth.init();
 
     // If no user after auth check, stop here (auth modal shown)
@@ -53,19 +56,9 @@ const App = (() => {
       return;
     }
 
-    // User is authenticated, initialize normal UI
+    // User is authenticated
     console.log('✓ User authenticated:', State.user.email);
 
-    // Initialize all modules
-    Canvas.init();
-    Selection.init();
-    Drag.init();
-    Toolbar.init();
-    ContextMenu.init();
-    Properties.init();
-    Keyboard.init();
-    Minimap.init();
-    CommandPalette.init();
     WelcomeModal.init();
     Sidebar.init();
 
@@ -87,6 +80,14 @@ const App = (() => {
     // Save immediately on page unload
     window.addEventListener('beforeunload', async () => {
       await Sync.saveCanvas();
+    });
+
+    // Fit view to show all loaded nodes — in case they are at large canvas coordinates
+    requestAnimationFrame(() => {
+      const nodes = State.getNodes();
+      if (nodes.length > 0) {
+        Canvas.fitView(nodes);
+      }
     });
 
     console.log('🚀 Visual Dashboard ready!');

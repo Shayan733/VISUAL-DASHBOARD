@@ -2,19 +2,23 @@
    Canvas — Infinite pan/zoom with dot grid
    ============================================ */
 
-#app {
+/* ── App Shell — Three-zone flex row ── */
+#app-shell {
+  display: flex;
+  flex-direction: row;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  position: relative;
+  background: #10121a;
 }
 
 /* ── Canvas Container ── */
+/* CONFLICT REMOVED: position:absolute; inset:0; right:var(--props-w); transition:right */
+/* REASON: canvas-container is now a flex child — flex:1 handles sizing automatically */
 #canvas-container {
-  position: absolute;
-  inset: 0;
-  right: var(--props-w);
-  transition: right 250ms ease;
+  flex: 1;
+  min-width: 0;          /* CRITICAL — prevents flex overflow bug */
+  position: relative;
   overflow: hidden;
   cursor: grab;
   background-color: var(--canvas-bg);
@@ -105,7 +109,7 @@
 #coords-display {
   position: absolute;
   bottom: var(--space-lg);
-  left: calc(var(--sidebar-w) + var(--space-lg));
+  left: var(--space-lg); /* was calc(--sidebar-w + space-lg) — sidebar is now a flex sibling, offset from canvas-container edge */
   padding: var(--space-xs) var(--space-md);
   background: var(--surface-3);
   border: 1px solid var(--border);

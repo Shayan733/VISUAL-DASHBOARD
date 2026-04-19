@@ -5,11 +5,12 @@
 /* ── Floating Island Container ── */
 #minimap {
   position: absolute;
-  bottom: var(--space-xl);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 240px;
-  height: 140px;
+  bottom: 20px;
+  right: 20px;
+  left: auto;
+  transform: none;
+  width: 160px;
+  height: 96px;
   background: rgba(30, 30, 48, 0.85);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -104,8 +105,8 @@
 
 /* ── Collapsed State ── */
 #minimap.collapsed {
-  height: 28px;
-  width: 120px;
+  height: 24px;
+  width: 80px;
 }
 
 #minimap.collapsed #minimap-canvas,

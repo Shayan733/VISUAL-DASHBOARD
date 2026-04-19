@@ -2,22 +2,25 @@
    Floating Toolbox
    ============================================ */
 
+/* CONFLICT REMOVED: position:fixed → position:absolute */
+/* REASON: fixed escapes #canvas-container and overlaps sidebar; absolute is bounded by canvas area */
 #toolbox {
-  position: fixed;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Never set inline left/top — position is always CSS-controlled */
   z-index: var(--z-toolbar);
 
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 2px;
 
-  background: var(--surface-3);
+  background: #0b0d12;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 6px;
+  border-radius: 10px;
+  padding: 4px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -29,37 +32,54 @@
 #toolbox.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-50%) translateX(-16px);
+  transform: translateX(-50%) translateY(20px);
 }
 
-/* When being dragged — remove the centering transform so left/top work absolutely */
-#toolbox.is-dragging {
-  transform: none;
-  transition: none;
-  opacity: 0.9;
+/* ── Show Toolbox Button (appears when toolbox is hidden) ── */
+#toolbox-show-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toolbar);
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: #0b0d12;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-3);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
 }
 
-/* ── Header (drag handle + close) ── */
+#toolbox-show-btn:hover {
+  color: var(--text-1);
+  border-color: var(--border-hover);
+}
+
+#toolbox-show-btn.visible {
+  display: flex;
+}
+
+/* ── Header (logo only, no drag) ── */
 .toolbox-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
   gap: 4px;
-  padding: 2px 0 4px;
-  cursor: grab;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 2px;
-}
-
-.toolbox-header:active {
-  cursor: grabbing;
+  padding: 0 4px 0 2px;
+  border-right: 1px solid var(--border);
+  margin-right: 2px;
+  flex-shrink: 0;
+  cursor: default;
 }
 
 .toolbox-brand {
   display: flex;
   align-items: center;
-  gap: 5px;
   pointer-events: none;
 }
 
@@ -80,12 +100,9 @@
   color: white;
 }
 
+/* Title hidden in horizontal mode — logo is enough */
 .toolbox-title {
-  font-size: 10px;
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-2);
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
+  display: none;
 }
 
 .toolbox-close-btn {
@@ -114,25 +131,24 @@
 /* ── Section grouping ── */
 .toolbox-section {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 2px;
-  width: 100%;
 }
 
 .toolbox-divider {
-  width: 24px;
-  height: 1px;
+  width: 1px;
+  height: 20px;
   background: var(--border);
-  margin: 3px 0;
+  margin: 0 3px;
   flex-shrink: 0;
 }
 
 /* ── Tool buttons ── */
 .tb-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,9 +191,9 @@
 .tb-btn::after {
   content: attr(title);
   position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   padding: 4px 8px;
   background: var(--surface-4);
   border: 1px solid var(--border);
@@ -210,8 +226,11 @@ body.read-only #btn-clear {
   display: none;
 }
 
+/* CONFLICT REMOVED: display:none !important — panel is a flex sibling, hide via transform instead */
 body.read-only #properties-panel {
-  display: none !important;
+  transform: translateX(214px) !important;
+  margin-right: -214px !important;
+  pointer-events: none;
 }
 
 body.read-only #btn-export-png,

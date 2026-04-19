@@ -53,25 +53,23 @@ const Sidebar = (() => {
     const toggleBtn = document.getElementById('sidebar-toggle');
     if (toggleBtn) {
       // Restore saved collapsed state
+      // REMOVED: --sidebar-w setProperty — flex handles canvas width automatically
       const savedCollapsed = localStorage.getItem('vd-sidebar-collapsed') === 'true';
       if (savedCollapsed) {
         document.getElementById('sidebar').classList.add('collapsed');
-        toggleBtn.classList.add('collapsed');
-        document.documentElement.style.setProperty('--sidebar-w', '0px');
       }
 
       toggleBtn.addEventListener('click', () => {
         const sidebar = document.getElementById('sidebar');
         const isCollapsed = sidebar.classList.toggle('collapsed');
-        toggleBtn.classList.toggle('collapsed', isCollapsed);
+        // REMOVED: toggleBtn.classList.toggle — CSS uses #sidebar.collapsed .sidebar-toggle-btn svg
+        // REMOVED: --sidebar-w setProperty — flex handles canvas width automatically
         localStorage.setItem('vd-sidebar-collapsed', isCollapsed);
-        // Update CSS variable so coords display and other elements adapt
-        document.documentElement.style.setProperty('--sidebar-w', isCollapsed ? '0px' : '188px');
-        // After the 250ms slide transition, redraw grid and connections
+        // After the 200ms width transition, redraw grid and connections
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
           if (typeof ConnectionRenderer !== 'undefined') ConnectionRenderer.renderAll();
-        }, 260);
+        }, 210);
       });
     }
 
@@ -129,64 +127,102 @@ const Sidebar = (() => {
     });
   };
 
+  const CANVAS_COLORS = [
+    { name: 'Violet',  hex: 'a78bfa' },
+    { name: 'Indigo',  hex: '818cf8' },
+    { name: 'Cyan',    hex: '22d3ee' },
+    { name: 'Emerald', hex: '34d399' },
+    { name: 'Amber',   hex: 'fbbf24' },
+    { name: 'Rose',    hex: 'fb7185' },
+    { name: 'Orange',  hex: 'fb923c' },
+    { name: 'Slate',   hex: '64748b' },
+  ];
+
   const showCanvasContextMenu = (canvas, item, e) => {
+    const existing = document.getElementById('canvas-ctx-menu');
+    if (existing) existing.remove();
+
     const menu = document.createElement('div');
+    menu.id = 'canvas-ctx-menu';
     menu.style.cssText = `
       position: fixed;
-      left: ${e.clientX}px;
-      top: ${e.clientY}px;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border-rest);
-      border-radius: 4px;
-      padding: 4px 0;
+      left: ${Math.min(e.clientX, window.innerWidth - 200)}px;
+      top: ${Math.min(e.clientY, window.innerHeight - 240)}px;
+      background: #0d0f16;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 6px;
       z-index: 10000;
-      min-width: 150px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      font-family: inherit;
     `;
 
-    const menuOptions = [
-      { label: 'Duplicate', action: () => Sync.duplicateCanvas(canvas.id) },
-      { label: 'Delete', action: () => {
-        if (confirm(`Delete "${canvas.name}"?`)) {
+    // ── Color picker section ──
+    const colorLabel = document.createElement('div');
+    colorLabel.textContent = 'Project Color';
+    colorLabel.style.cssText = 'font-size:10px;color:#555970;text-transform:uppercase;letter-spacing:0.5px;padding:4px 6px 6px;';
+    menu.appendChild(colorLabel);
+
+    const swatchRow = document.createElement('div');
+    swatchRow.style.cssText = 'display:flex;gap:5px;flex-wrap:wrap;padding:0 4px 8px;';
+    CANVAS_COLORS.forEach(({ name, hex }) => {
+      const swatch = document.createElement('button');
+      swatch.title = name;
+      swatch.style.cssText = `
+        width:20px;height:20px;border-radius:50%;background:#${hex};border:2px solid ${canvas.color === hex ? '#fff' : 'transparent'};
+        cursor:pointer;transition:transform 0.1s,border-color 0.1s;flex-shrink:0;
+      `;
+      swatch.addEventListener('mouseenter', () => swatch.style.transform = 'scale(1.2)');
+      swatch.addEventListener('mouseleave', () => swatch.style.transform = '');
+      swatch.addEventListener('click', () => {
+        Sync.updateCanvasMeta(canvas.id, { color: hex });
+        const dot = item.querySelector('.canvas-dot');
+        if (dot) dot.style.background = `#${hex}`;
+        menu.remove();
+      });
+      swatchRow.appendChild(swatch);
+    });
+    menu.appendChild(swatchRow);
+
+    // ── Divider ──
+    const divider = document.createElement('div');
+    divider.style.cssText = 'height:1px;background:rgba(255,255,255,0.07);margin:2px 0 6px;';
+    menu.appendChild(divider);
+
+    // ── Action buttons ──
+    const actions = [
+      { label: 'Rename', icon: '✏️', action: async () => {
+        const name = prompt('Rename canvas:', canvas.name);
+        if (name && name.trim() && name.trim() !== canvas.name) {
+          await Sync.updateCanvasMeta(canvas.id, { name: name.trim() });
+        }
+      }},
+      { label: 'Duplicate', icon: '⎘', action: () => Sync.duplicateCanvas(canvas.id) },
+      { label: 'Delete', icon: '🗑', danger: true, action: () => {
+        if (confirm(`Delete "${canvas.name}"? This cannot be undone.`)) {
           Sync.deleteCanvas(canvas.id);
         }
-      }}
+      }},
     ];
 
-    menuOptions.forEach(opt => {
+    actions.forEach(({ label, icon, danger, action }) => {
       const btn = document.createElement('button');
-      btn.textContent = opt.label;
-      btn.className = 'canvas-context-menu-item';
+      btn.innerHTML = `<span style="opacity:0.6;margin-right:7px">${icon}</span>${label}`;
       btn.style.cssText = `
-        display: block;
-        width: 100%;
-        padding: 8px 12px;
-        background: transparent;
-        border: none;
-        text-align: left;
-        font-size: 12px;
-        color: #E0E0E0;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        display:flex;align-items:center;width:100%;padding:7px 8px;background:transparent;border:none;
+        border-radius:5px;text-align:left;font-size:12px;color:${danger ? '#fb7185' : '#c0c0d0'};
+        cursor:pointer;transition:background 0.1s;
       `;
-      btn.addEventListener('mouseenter', () => {
-        btn.style.background = '#252525';
-      });
-      btn.addEventListener('mouseleave', () => {
-        btn.style.background = 'transparent';
-      });
-      btn.addEventListener('click', () => {
-        opt.action();
-        document.body.removeChild(menu);
-      });
+      btn.addEventListener('mouseenter', () => btn.style.background = danger ? 'rgba(251,113,133,0.1)' : 'rgba(255,255,255,0.06)');
+      btn.addEventListener('mouseleave', () => btn.style.background = 'transparent');
+      btn.addEventListener('click', () => { action(); menu.remove(); });
       menu.appendChild(btn);
     });
 
     document.body.appendChild(menu);
     setTimeout(() => {
-      document.addEventListener('click', () => {
-        if (menu.parentNode) document.body.removeChild(menu);
-      }, { once: true });
+      document.addEventListener('click', () => { if (menu.parentNode) menu.remove(); }, { once: true });
     }, 0);
   };
 
