@@ -123,5 +123,23 @@ const FirebaseAuth = (() => {
     return firebaseUser;
   };
 
+  // Bind auth modal buttons here instead of inline onclick attributes —
+  // inline handlers are blocked by the Content-Security-Policy.
+  const bindAuthModal = () => {
+    const googleBtn = document.getElementById('google-login-btn');
+    if (googleBtn) googleBtn.addEventListener('click', googleLogin);
+
+    const magicBtn = document.getElementById('magic-link-btn');
+    const emailInput = document.getElementById('magic-email');
+    if (magicBtn && emailInput) {
+      const submit = () => magicLinkLogin(emailInput.value.trim());
+      magicBtn.addEventListener('click', submit);
+      emailInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submit();
+      });
+    }
+  };
+  bindAuthModal();
+
   return { init, googleLogin, magicLinkLogin, logout, getUser, showAuthModal, hideAuthModal };
 })();

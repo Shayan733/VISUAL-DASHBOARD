@@ -8,8 +8,8 @@ export const approveScene: ToolDef = {
     'Founder-only: flip a scene from draft to approved. ' +
     'Refused if the scene has no prose yet.',
   schema: {
-    project_id: z.string().min(1),
-    scene_number: z.number().int().min(1),
+    project_id: z.string().min(1).max(100),
+    scene_number: z.number().int().min(1).max(10_000),
   },
   async handler(store, args) {
     const projectId = String(args.project_id);

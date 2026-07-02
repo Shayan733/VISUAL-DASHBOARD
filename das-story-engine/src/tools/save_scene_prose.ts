@@ -8,9 +8,9 @@ export const saveSceneProse: ToolDef = {
     'Attach prose to an existing scene card as a NEW version (old drafts are kept). ' +
     'The scene state moves to "draft" — the founder approves it with approve_scene.',
   schema: {
-    project_id: z.string().min(1),
-    scene_number: z.number().int().min(1),
-    prose: z.string().min(1).describe('The scene prose — action in English, dialogue in Romanised Hindi'),
+    project_id: z.string().min(1).max(100),
+    scene_number: z.number().int().min(1).max(10_000),
+    prose: z.string().min(1).max(200_000).describe('The scene prose — action in English, dialogue in Romanised Hindi'),
   },
   async handler(store, args) {
     try {

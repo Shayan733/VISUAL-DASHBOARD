@@ -8,11 +8,11 @@ export const saveSpine: ToolDef = {
     'Always writes a NEW version — old spines are never overwritten. ' +
     'Set approved=true only after the founder locks it.',
   schema: {
-    project_id: z.string().min(1),
-    want: z.string().min(1).describe('What the hero wants'),
-    stakes: z.string().min(1).describe('What happens if they fail'),
-    hero_belief: z.string().min(1).describe('The lie/belief the hero starts with'),
-    villain_belief: z.string().min(1).describe('The belief the villain embodies'),
+    project_id: z.string().min(1).max(100),
+    want: z.string().min(1).max(2_000).describe('What the hero wants'),
+    stakes: z.string().min(1).max(2_000).describe('What happens if they fail'),
+    hero_belief: z.string().min(1).max(2_000).describe('The lie/belief the hero starts with'),
+    villain_belief: z.string().min(1).max(2_000).describe('The belief the villain embodies'),
     approved: z.boolean().default(false).describe('Founder approval flag'),
   },
   async handler(store, args) {

@@ -7,13 +7,13 @@ export const savePlants: ToolDef = {
     'Save the plant/payoff table (replaces the previous table for this project). ' +
     'A plant without a payoff_scene stays status "orphan" — the audit will catch it.',
   schema: {
-    project_id: z.string().min(1),
+    project_id: z.string().min(1).max(100),
     plants: z.array(z.object({
-      plant_text: z.string().min(1).describe('What is planted'),
-      planted_scene: z.number().int().min(1).describe('Scene number where it is planted'),
-      payoff_text: z.string().optional().describe('How it pays off (omit if not yet decided)'),
-      payoff_scene: z.number().int().min(1).optional().describe('Scene number where it pays off'),
-    })).min(1),
+      plant_text: z.string().min(1).max(2_000).describe('What is planted'),
+      planted_scene: z.number().int().min(1).max(10_000).describe('Scene number where it is planted'),
+      payoff_text: z.string().max(2_000).optional().describe('How it pays off (omit if not yet decided)'),
+      payoff_scene: z.number().int().min(1).max(10_000).optional().describe('Scene number where it pays off'),
+    })).min(1).max(200),
   },
   async handler(store, args) {
     const plants = args.plants as Array<{

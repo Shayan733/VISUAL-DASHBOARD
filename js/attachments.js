@@ -43,30 +43,18 @@ const Attachments = (() => {
     return node ? (node.attachments || []) : [];
   };
 
-  /* ── OG metadata fetch ── */
+  /* ── Link metadata ──
+     Privacy: we deliberately do NOT fetch OpenGraph data. The old
+     implementation routed every pasted URL through corsproxy.io — a
+     third party seeing everything users attach. Titles are derived
+     locally from the URL; a first-party OG proxy (Cloud Function) can
+     restore rich previews later. */
 
   const fetchOG = async (url) => {
     try {
-      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
-      const html = await res.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-
-      const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content')
-        || doc.querySelector('title')?.textContent
-        || new URL(url).hostname;
-
-      const ogImage = Sanitize.sanitizeUrl(
-        doc.querySelector('meta[property="og:image"]')?.getAttribute('content')
-      );
-
-      return { ogTitle: ogTitle.trim(), ogImage };
+      return { ogTitle: new URL(url).hostname, ogImage: null };
     } catch {
-      try {
-        return { ogTitle: new URL(url).hostname, ogImage: null };
-      } catch {
-        return { ogTitle: url, ogImage: null };
-      }
+      return { ogTitle: url, ogImage: null };
     }
   };
 

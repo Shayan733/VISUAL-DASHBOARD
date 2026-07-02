@@ -2,6 +2,7 @@
    Run: npm run dev  →  http://localhost:8787/mcp                      */
 
 import { readFileSync, existsSync } from 'node:fs';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import express from 'express';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createStore } from '../db/index.js';
@@ -31,14 +32,45 @@ if (!TOKEN || TOKEN === 'change-me') {
 const store = createStore();
 const usingSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY);
 
+/* Constant-time token check — hashing first makes lengths equal, so
+   neither content nor length leaks through timing. */
+const tokenHash = createHash('sha256').update(TOKEN).digest();
+function tokenMatches(provided: string): boolean {
+  const providedHash = createHash('sha256').update(provided).digest();
+  return timingSafeEqual(providedHash, tokenHash);
+}
+
+/* Small in-memory rate limit — one-person tool; this only blunts
+   brute-force attempts against the bearer token. */
+const RATE_LIMIT = 120; // requests per minute per IP
+const hits = new Map<string, { count: number; windowStart: number }>();
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = hits.get(ip);
+  if (!entry || now - entry.windowStart > 60_000) {
+    hits.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > RATE_LIMIT;
+}
+
 const app = express();
 app.use(express.json({ limit: '4mb' }));
 
 /* Auth gate — rejected BEFORE any tool code runs. */
 app.use('/mcp', (req, res, next) => {
+  if (rateLimited(req.ip ?? 'unknown')) {
+    res.status(429).json({
+      jsonrpc: '2.0',
+      error: { code: -32000, message: 'Rate limit exceeded' },
+      id: null,
+    });
+    return;
+  }
   const header = req.headers.authorization ?? '';
   const provided = header.startsWith('Bearer ') ? header.slice(7) : '';
-  if (provided !== TOKEN) {
+  if (!tokenMatches(provided)) {
     res.status(401).json({
       jsonrpc: '2.0',
       error: { code: -32001, message: 'Unauthorized: missing or invalid bearer token' },

@@ -6,11 +6,11 @@ export const savePhases: ToolDef = {
   description:
     'Save all 8 phase one-liners in one call (replaces the previous set for this project).',
   schema: {
-    project_id: z.string().min(1),
+    project_id: z.string().min(1).max(100),
     phases: z.array(z.object({
       phase_number: z.number().int().min(1).max(8),
-      phase_name: z.string().min(1),
-      one_liner: z.string().min(1),
+      phase_name: z.string().min(1).max(200),
+      one_liner: z.string().min(1).max(1_000),
     })).length(8).describe('Exactly 8 phases, numbered 1–8'),
   },
   async handler(store, args) {

@@ -4,6 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Content-Security-Policy — structural backstop against XSS:
+       even if an escaping bug slips in, injected <script> tags and inline
+       handlers will not execute. style-src needs 'unsafe-inline' because the
+       app sets style attributes/cssText throughout (no inline <script> does).
+       If a feature breaks, check the browser console for a CSP violation. -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src https://fonts.gstatic.com;
+    img-src 'self' https: data:;
+    connect-src 'self' https://*.googleapis.com https://firebasestorage.googleapis.com;
+    frame-src https://visual-dashboard-760aa.firebaseapp.com https://accounts.google.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
   <title>Visual Dashboard — System Design Canvas</title>
   <meta name="description"
     content="A visual system design canvas for planning workflows, hierarchies, and business systems. Drag, connect, and organize your ideas visually.">
@@ -235,14 +252,14 @@
     <div class="modal-content" style="max-width: 400px;">
       <h1 style="margin-bottom: 16px; font-size: 20px; color: var(--text-primary);">Sign in to Visual Dashboard</h1>
 
-      <button onclick="FirebaseAuth.googleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
+      <button id="google-login-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 16px; padding: 10px 16px; cursor: pointer;">
         Google Sign In
       </button>
 
       <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">or</div>
 
       <input type="email" id="magic-email" placeholder="your@email.com" style="width: 100%; padding: 8px 12px; margin-bottom: 8px; background: var(--node-bg-resting); border: 0.5px solid var(--node-border-rest); color: var(--text-primary); border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
-      <button onclick="FirebaseAuth.magicLinkLogin(document.getElementById('magic-email').value)" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
+      <button id="magic-link-btn" class="btn btn-secondary" style="width: 100%; padding: 10px 16px; cursor: pointer;">
         Send Magic Link
       </button>
 

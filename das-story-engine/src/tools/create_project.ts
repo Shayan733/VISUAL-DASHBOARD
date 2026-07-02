@@ -7,8 +7,8 @@ export const createProject: ToolDef = {
     'Start a new story project from a title and a replication brief. ' +
     'Returns the project id — use it in every later call.',
   schema: {
-    title: z.string().min(1).describe('Working title of the story'),
-    brief_text: z.string().default('').describe('The replication brief the story starts from'),
+    title: z.string().min(1).max(300).describe('Working title of the story'),
+    brief_text: z.string().max(50_000).default('').describe('The replication brief the story starts from'),
   },
   async handler(store, args) {
     const project = await store.createProject(

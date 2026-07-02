@@ -8,8 +8,8 @@ export const getProjectState: ToolDef = {
     'per-scene states, orphan plants, last audit. This is the session memory; ' +
     'call it at the start of any new chat. Pass project_id, or title to look it up.',
   schema: {
-    project_id: z.string().optional(),
-    title: z.string().optional().describe('Look up the project by title if id is unknown'),
+    project_id: z.string().max(100).optional(),
+    title: z.string().max(300).optional().describe('Look up the project by title if id is unknown'),
   },
   async handler(store, args) {
     let projectId = args.project_id ? String(args.project_id) : null;

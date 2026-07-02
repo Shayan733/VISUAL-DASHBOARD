@@ -18,11 +18,26 @@ interface Env {
   SUPABASE_SERVICE_KEY: string;
 }
 
+/* Constant-time comparison via SHA-256 digests (equal lengths, no
+   content/length timing leak) — mirrors the local server's check. */
+async function tokenMatches(provided: string, expected: string): Promise<boolean> {
+  const enc = new TextEncoder();
+  const [a, b] = await Promise.all([
+    crypto.subtle.digest('SHA-256', enc.encode(provided)),
+    crypto.subtle.digest('SHA-256', enc.encode(expected)),
+  ]);
+  const va = new Uint8Array(a);
+  const vb = new Uint8Array(b);
+  let diff = 0;
+  for (let i = 0; i < va.length; i++) diff |= va[i] ^ vb[i];
+  return diff === 0;
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const auth = request.headers.get('authorization') ?? '';
     const provided = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-    if (!env.DSE_BEARER_TOKEN || provided !== env.DSE_BEARER_TOKEN) {
+    if (!env.DSE_BEARER_TOKEN || !(await tokenMatches(provided, env.DSE_BEARER_TOKEN))) {
       return new Response(
         JSON.stringify({
           jsonrpc: '2.0',
