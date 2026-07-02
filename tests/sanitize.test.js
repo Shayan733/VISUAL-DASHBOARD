@@ -187,4 +187,16 @@ describe('legacy template migration', () => {
     const s = Sanitize.validateState({ nodes: [{ id: 'n1', status: 'in-progress' }] });
     expect(s.nodes[0].status).toBe('progress');
   });
+
+  it('preserves node ids as data (escaped at render, not dropped)', () => {
+    // Malicious ids survive validateState (referential integrity with
+    // parentId/connections); render sites escape them. This documents
+    // that contract so the escaping is never quietly removed.
+    const evilId = 'x"><img src=https://evil/log>';
+    const s = Sanitize.validateState({ nodes: [{ id: evilId, label: 'n' }] });
+    expect(s.nodes[0].id).toBe(evilId);
+    // The canonical escaper neutralizes it wherever it reaches HTML
+    expect(escapeHtml(s.nodes[0].id)).not.toMatch(/[<>]/);
+    expect(escapeHtml(s.nodes[0].id)).not.toContain('"');
+  });
 });

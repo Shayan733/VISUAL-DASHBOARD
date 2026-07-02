@@ -140,7 +140,7 @@ function getPortPosition(node, port) {
   // Prefer live DOM height (captures image attachments, wrapping text, etc.)
   let h = node.height || 60;
   if (node.id && typeof Canvas !== 'undefined' && Canvas.nodesLayer) {
-    const el = Canvas.nodesLayer.querySelector(`[data-id="${node.id}"]`);
+    const el = Canvas.nodesLayer.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
     if (el) h = el.offsetHeight;
   }
 

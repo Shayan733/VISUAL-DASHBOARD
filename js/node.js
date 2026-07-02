@@ -62,9 +62,9 @@ const NodeRenderer = (() => {
       <div class="node-description">
         <textarea placeholder="Add description...">${escapeHtml(node.description || '')}</textarea>
       </div>
-      <div class="node-footer" id="footer-${node.id}">
+      <div class="node-footer" id="footer-${escapeHtml(node.id)}">
         ${node.attachments && node.attachments.length > 0 ? `
-          <div class="attachment-count-badge" data-node-id="${node.id}">
+          <div class="attachment-count-badge" data-node-id="${escapeHtml(node.id)}">
             ${Attachments.PAPERCLIP_SVG}
             <span>${node.attachments.length}</span>
           </div>
@@ -194,7 +194,7 @@ const NodeRenderer = (() => {
    */
   function renderNode(node) {
     const nodesLayer = Canvas.nodesLayer;
-    let el = nodesLayer.querySelector(`[data-id="${node.id}"]`);
+    let el = nodesLayer.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
 
     if (!el) {
       if (node.type === 'sticky') {
@@ -281,7 +281,7 @@ const NodeRenderer = (() => {
     if (footer && node.type !== 'group') {
       const count = node.attachments ? node.attachments.length : 0;
       footer.innerHTML = count > 0 ? `
-        <div class="attachment-count-badge" data-node-id="${node.id}">
+        <div class="attachment-count-badge" data-node-id="${escapeHtml(node.id)}">
           ${Attachments.PAPERCLIP_SVG}
           <span>${count}</span>
         </div>

@@ -9,7 +9,7 @@ const appGlobals = {
   requestAnimationFrame: 'readonly', setTimeout: 'readonly',
   setInterval: 'readonly', clearTimeout: 'readonly', clearInterval: 'readonly',
   URL: 'readonly', URLSearchParams: 'readonly', Blob: 'readonly',
-  Image: 'readonly', Event: 'readonly', FormData: 'readonly',
+  Image: 'readonly', Event: 'readonly', FormData: 'readonly', CSS: 'readonly',
   FileReader: 'readonly', DOMParser: 'readonly', ResizeObserver: 'readonly',
   AbortSignal: 'readonly', atob: 'readonly', btoa: 'readonly',
   alert: 'readonly', confirm: 'readonly', prompt: 'readonly',

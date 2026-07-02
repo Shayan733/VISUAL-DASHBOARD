@@ -209,7 +209,7 @@ const CommandPalette = (() => {
     NodeRenderer.renderNode(node);
     Selection.select(node.id);
 
-    const el = Canvas.nodesLayer.querySelector(`[data-id="${node.id}"]`);
+    const el = Canvas.nodesLayer.querySelector(`[data-id="${CSS.escape(node.id)}"]`);
     if (!el) return;
 
     // Sticky notes: focus the textarea directly
