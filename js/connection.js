@@ -82,7 +82,7 @@ const ConnectionRenderer = (() => {
     group.appendChild(hitArea);
 
     // Main path
-    const connColor = sourceNode.color || 'var(--accent)';
+    const connColor = Sanitize.sanitizeColor(sourceNode.color, 'var(--accent)');
     const markerId = ensureColoredArrowMarker(svg, connColor, conn.id);
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.classList.add('connection-path');
@@ -97,7 +97,7 @@ const ConnectionRenderer = (() => {
       const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       flow.classList.add('connection-flow');
       flow.setAttribute('d', pathData);
-      flow.style.stroke = sourceNode.color || 'rgba(255,255,255,0.3)';
+      flow.style.stroke = Sanitize.sanitizeColor(sourceNode.color, 'rgba(255,255,255,0.3)');
       group.appendChild(flow);
     }
 

@@ -210,7 +210,9 @@ function deepClone(obj) {
  */
 function hexToRgba(hex, alpha) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return hex;
+  // Never echo unparseable input back into a style — fall back to the
+  // default accent so malformed/malicious values die here.
+  if (!result) return `rgba(129,140,248,${alpha})`;
   return `rgba(${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)},${alpha})`;
 }
 

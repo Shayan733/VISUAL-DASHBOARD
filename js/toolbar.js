@@ -108,8 +108,13 @@ const Toolbar = (() => {
   }
 
   function save() {
-    State.save();
-    showSaveIndicator();
+    if (State.user && State.currentCanvasId) {
+      // Signed in: save to the cloud, not just localStorage
+      Sync.saveCanvas().then(() => showSaveIndicator('Saved to cloud ✓'));
+    } else {
+      State.save();
+      showSaveIndicator();
+    }
   }
 
   function clearCanvas() {

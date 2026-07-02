@@ -1,0 +1,16 @@
+{
+  "name": "visual-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Visual system design canvas — plan workflows, hierarchies, and business systems.",
+  "scripts": {
+    "dev": "npx serve .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint js/"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "vitest": "^3.0.0"
+  }
+}

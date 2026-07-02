@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Server-side access control for Visual Dashboard.
+// This is the ONLY real security boundary — the client-side
+// userId checks in js/sync.js are convenience, not enforcement.
+//
+// Deploy with:
+//   firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsResource() {
+      return signedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    function createsAsSelf() {
+      return signedIn() && request.auth.uid == request.resource.data.userId;
+    }
+
+    match /canvases/{canvasId} {
+      allow read, update, delete: if ownsResource();
+      // userId on a canvas must be the caller and can never change
+      allow create: if createsAsSelf();
+    }
+
+    match /canvas_snapshots/{snapshotId} {
+      allow read, delete: if ownsResource();
+      allow create: if createsAsSelf();
+      // Snapshots are immutable once written
+      allow update: if false;
+    }
+
+    // Everything else is denied
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

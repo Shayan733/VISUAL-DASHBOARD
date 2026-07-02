@@ -26,7 +26,7 @@ const Keyboard = (() => {
     // ── Ctrl/Cmd + Z — Undo ──
     if (mod && !e.shiftKey && e.key === 'z') {
       e.preventDefault();
-      if (History.undo()) {
+      if (!State.readOnly && History.undo()) {
         NodeRenderer.renderAll();
         ConnectionRenderer.renderAll();
       }
@@ -36,7 +36,7 @@ const Keyboard = (() => {
     // ── Ctrl/Cmd + Shift + Z — Redo ──
     if (mod && e.shiftKey && e.key === 'z') {
       e.preventDefault();
-      if (History.redo()) {
+      if (!State.readOnly && History.redo()) {
         NodeRenderer.renderAll();
         ConnectionRenderer.renderAll();
       }
@@ -46,8 +46,14 @@ const Keyboard = (() => {
     // ── Ctrl/Cmd + S — Save ──
     if (mod && e.key === 's') {
       e.preventDefault();
-      State.save();
-      Toolbar.showSaveIndicator();
+      if (State.readOnly) return;
+      if (State.user && State.currentCanvasId) {
+        // Signed in: save to the cloud, not just localStorage
+        Sync.saveCanvas().then(() => Toolbar.showSaveIndicator('Saved to cloud ✓'));
+      } else {
+        State.save();
+        Toolbar.showSaveIndicator();
+      }
       return;
     }
 

@@ -434,6 +434,11 @@ const Drag = (() => {
     const nodeEl = handle.closest('.canvas-node');
     resizeTarget = nodeEl.dataset.id;
     const node = State.getNodeById(resizeTarget);
+    if (!node) {
+      isResizing = false;
+      resizeTarget = null;
+      return;
+    }
     resizeStartWidth = node.width;
     resizeStartHeight = node.height || 60;
   }

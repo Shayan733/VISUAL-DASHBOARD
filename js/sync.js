@@ -240,6 +240,7 @@ const Sync = (() => {
         canvasId: State.currentCanvasId,
         name,
         stateJson: State.toJSON(),
+        userId: State.user.id,
         createdBy: State.user.id,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
@@ -294,16 +295,15 @@ const Sync = (() => {
   };
 
   const updateCanvasMeta = async (canvasId, fields) => {
-    if (!State.user || !window.SupabaseClient) return;
+    if (!State.user || !canvasId) return;
     try {
-      const { error } = await SupabaseClient
-        .from('canvases')
-        .update(fields)
-        .eq('id', canvasId)
-        .eq('user_id', State.user.id);
-      if (error) { showToast('Failed to update canvas', 'error'); return; }
+      await canvasesCol().doc(canvasId).update({
+        ...fields,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
       Sidebar.refresh();
     } catch (e) {
+      console.error('Update canvas meta error:', e);
       showToast('Failed to update canvas', 'error');
     }
   };

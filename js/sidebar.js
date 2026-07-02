@@ -105,10 +105,10 @@ const Sidebar = (() => {
       item.classList.toggle('active', canvas.id === State.currentCanvasId);
 
       const timeAgo = canvas.updatedAt ? getTimeAgo(canvas.updatedAt.toDate ? canvas.updatedAt.toDate() : canvas.updatedAt) : 'just now';
-      const dotColor = canvas.color || '818cf8';
+      const dotColor = Sanitize.sanitizeColor(canvas.color, '#818cf8');
 
       item.innerHTML = `
-        <div class="canvas-dot" style="background: #${dotColor};"></div>
+        <div class="canvas-dot" style="background: ${dotColor};"></div>
         <div class="canvas-info">
           <div class="canvas-name">${escapeHtml(canvas.name)}</div>
           <div class="canvas-time">${timeAgo}</div>
@@ -244,11 +244,4 @@ function getTimeAgo(timestamp) {
   return date.toLocaleDateString();
 }
 
-/**
- * Escape HTML to prevent XSS
- */
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+/* escapeHtml is provided globally by js/sanitize.js */

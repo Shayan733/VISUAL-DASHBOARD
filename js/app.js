@@ -25,7 +25,13 @@ const App = (() => {
     if (hash && hash.includes('state=')) {
       const encoded = hash.replace('#state=', '');
       try {
+        // Cap decoded size before parsing — a share link should never
+        // carry multi-megabyte payloads.
+        if (encoded.length > 2 * 1024 * 1024) {
+          throw new Error('Share link payload too large');
+        }
         const state = JSON.parse(decodeURIComponent(atob(encoded)));
+        // State.loadFromJSON runs Sanitize.validateState on this
         State.loadFromJSON(state);
         State.readOnly = true;
         document.body.classList.add('read-only');
@@ -42,6 +48,9 @@ const App = (() => {
         }
       } catch (e) {
         console.error('Failed to decode state', e);
+        if (window.showToast) {
+          showToast('This share link is invalid or corrupted', 'error');
+        }
       }
       console.log('🚀 Visual Dashboard ready!');
       return;

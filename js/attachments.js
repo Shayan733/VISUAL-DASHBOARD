@@ -56,7 +56,9 @@ const Attachments = (() => {
         || doc.querySelector('title')?.textContent
         || new URL(url).hostname;
 
-      const ogImage = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || null;
+      const ogImage = Sanitize.sanitizeUrl(
+        doc.querySelector('meta[property="og:image"]')?.getAttribute('content')
+      );
 
       return { ogTitle: ogTitle.trim(), ogImage };
     } catch {
@@ -115,8 +117,9 @@ const Attachments = (() => {
   const addLink = async (nodeId, url) => {
     if (!url) return;
 
-    // Basic URL validation
-    try { new URL(url); } catch {
+    // Only http/https URLs are allowed (blocks javascript:/data:)
+    url = Sanitize.sanitizeUrl(url);
+    if (!url) {
       showToast('Enter a valid URL (include https://)', 'error');
       return;
     }
@@ -225,33 +228,68 @@ const Attachments = (() => {
       const item = document.createElement('div');
       item.className = 'attachment-item';
 
-      let previewHTML;
-      if (att.attachmentType === 'image') {
-        previewHTML = `<img class="attachment-item-thumb" src="${att.url}" alt="${escapeHtml(att.name)}" loading="lazy">`;
-      } else if (att.attachmentType === 'link' && att.ogImage) {
-        previewHTML = `<img class="attachment-item-og-image" src="${att.ogImage}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'attachment-item-icon\\'>${ICONS.link}</div>'">`;
+      const safeUrl = Sanitize.sanitizeUrl(att.url);
+      const safeOgImage = Sanitize.sanitizeUrl(att.ogImage);
+
+      // Preview — built with createElement so attacker-controlled URLs
+      // can never break out into markup.
+      const fallbackIcon = () => {
+        const icon = document.createElement('div');
+        icon.className = 'attachment-item-icon';
+        icon.textContent = ICONS[att.attachmentType] || ICONS.file;
+        return icon;
+      };
+
+      let preview;
+      if (att.attachmentType === 'image' && safeUrl) {
+        preview = document.createElement('img');
+        preview.className = 'attachment-item-thumb';
+        preview.src = safeUrl;
+        preview.alt = att.name || '';
+        preview.loading = 'lazy';
+        preview.addEventListener('error', () => preview.replaceWith(fallbackIcon()));
+      } else if (att.attachmentType === 'link' && safeOgImage) {
+        preview = document.createElement('img');
+        preview.className = 'attachment-item-og-image';
+        preview.src = safeOgImage;
+        preview.alt = '';
+        preview.loading = 'lazy';
+        preview.addEventListener('error', () => preview.replaceWith(fallbackIcon()));
       } else {
-        previewHTML = `<div class="attachment-item-icon">${ICONS[att.attachmentType] || ICONS.file}</div>`;
+        preview = fallbackIcon();
+      }
+      item.appendChild(preview);
+
+      let meta = '';
+      if (att.attachmentType === 'link') {
+        try { meta = safeUrl ? new URL(safeUrl).hostname : ''; } catch { meta = ''; }
+      } else {
+        meta = formatBytes(att.size);
       }
 
-      const meta = att.attachmentType === 'link'
-        ? (att.url ? new URL(att.url).hostname : '')
-        : formatBytes(att.size);
+      const info = document.createElement('div');
+      info.className = 'attachment-item-info';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'attachment-item-name';
+      nameEl.textContent = att.name || 'Attachment';
+      const metaEl = document.createElement('div');
+      metaEl.className = 'attachment-item-meta';
+      metaEl.textContent = meta;
+      info.appendChild(nameEl);
+      info.appendChild(metaEl);
+      item.appendChild(info);
 
-      item.innerHTML = `
-        ${previewHTML}
-        <div class="attachment-item-info">
-          <div class="attachment-item-name">${escapeHtml(att.name)}</div>
-          <div class="attachment-item-meta">${meta}</div>
-        </div>
-        <button class="attachment-item-delete" data-att-id="${att.id}" title="Remove attachment">
-          ${DELETE_SVG}
-        </button>`;
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'attachment-item-delete';
+      deleteBtn.dataset.attId = att.id;
+      deleteBtn.title = 'Remove attachment';
+      deleteBtn.innerHTML = DELETE_SVG;
+      item.appendChild(deleteBtn);
 
-      // Open/download on click (not on delete btn)
+      // Open/download on click (not on delete btn) — http/https only
       item.addEventListener('click', (e) => {
         if (e.target.closest('.attachment-item-delete')) return;
-        window.open(att.url, '_blank', 'noopener');
+        if (safeUrl) window.open(safeUrl, '_blank', 'noopener');
       });
 
       // Delete
@@ -268,7 +306,7 @@ const Attachments = (() => {
 
   const refreshPanel = (nodeId) => {
     const panel = document.getElementById('properties-panel');
-    if (!panel || !panel.classList.contains('visible')) return;
+    if (!panel || !panel.classList.contains('open')) return;
     // Only refresh if the panel is showing this node
     const panelNodeId = panel.dataset.nodeId;
     if (panelNodeId !== nodeId) return;

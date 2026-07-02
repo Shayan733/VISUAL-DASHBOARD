@@ -259,6 +259,14 @@ const State = (() => {
       newNodes.push(clone);
     });
 
+    // Remap parentId for clones whose parent was also duplicated,
+    // so a copied child doesn't stay attached to the original group.
+    newNodes.forEach(clone => {
+      if (clone.parentId && idMap[clone.parentId]) {
+        clone.parentId = idMap[clone.parentId];
+      }
+    });
+
     // Duplicate connections between duplicated nodes
     state.connections.forEach(conn => {
       if (idMap[conn.sourceId] && idMap[conn.targetId]) {
@@ -368,7 +376,7 @@ const State = (() => {
       reader.onload = (e) => {
         try {
           const imported = JSON.parse(e.target.result);
-          state = imported;
+          state = Sanitize.validateState(imported);
           if (state.canvas) {
             Canvas.offsetX = state.canvas.offsetX || 0;
             Canvas.offsetY = state.canvas.offsetY || 0;
@@ -420,11 +428,11 @@ const State = (() => {
    */
   function loadFromJSON(jsonData) {
     try {
-      state = {
-        canvas: jsonData.canvas || { offsetX: 0, offsetY: 0, zoom: 1 },
-        nodes: jsonData.nodes || [],
-        connections: jsonData.connections || [],
-      };
+      state = Sanitize.validateState(jsonData);
+      // Reset history so undo can't restore a previously loaded canvas
+      // into this one (data corruption across canvas switches).
+      History.clear();
+      History.push();
       notify('loaded', state);
       return true;
     } catch (error) {

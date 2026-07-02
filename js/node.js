@@ -52,15 +52,15 @@ const NodeRenderer = (() => {
       : '';
 
     return `
-      <div class="node-accent" style="background: ${node.color}"></div>
+      <div class="node-accent" style="background: ${Sanitize.sanitizeColor(node.color)}"></div>
       <div class="node-header">
         <div class="node-status-badge" title="Status: ${statusDef.label}" style="${statusStyle}">
           ${statusDef.icon}
         </div>
-        <div class="node-label">${escapeHTML(node.label)}</div>
+        <div class="node-label">${escapeHtml(node.label)}</div>
       </div>
       <div class="node-description">
-        <textarea placeholder="Add description...">${escapeHTML(node.description || '')}</textarea>
+        <textarea placeholder="Add description...">${escapeHtml(node.description || '')}</textarea>
       </div>
       <div class="node-footer" id="footer-${node.id}">
         ${node.attachments && node.attachments.length > 0 ? `
@@ -79,14 +79,14 @@ const NodeRenderer = (() => {
   function buildGroupHTML(node) {
     const children = State.getChildren(node.id);
     return `
-      <div class="group-color-strip" style="background: ${node.color}"></div>
+      <div class="group-color-strip" style="background: ${Sanitize.sanitizeColor(node.color)}"></div>
       <div class="group-header">
         <button class="group-collapse-btn" title="Collapse/Expand">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
-        <div class="group-label">${escapeHTML(node.label)}</div>
+        <div class="group-label">${escapeHtml(node.label)}</div>
         <span class="group-count">${children.length}</span>
       </div>
       <div class="group-body"></div>
@@ -146,7 +146,7 @@ const NodeRenderer = (() => {
   }
 
   function buildStickyHTML(note) {
-    const color = note.color || '#fbbf24';
+    const color = Sanitize.sanitizeColor(note.color, '#fbbf24');
     return `
       <div class="sticky-header" style="background:${hexToRgba(color, 0.3)}">
         <svg class="sticky-icon" viewBox="0 0 16 16" fill="currentColor" width="12" height="12">
@@ -154,14 +154,15 @@ const NodeRenderer = (() => {
         </svg>
         <span class="sticky-label">Note</span>
       </div>
-      <textarea class="sticky-text" placeholder="Write a note...">${escapeHTML(note.description || '')}</textarea>
+      <textarea class="sticky-text" placeholder="Write a note...">${escapeHtml(note.description || '')}</textarea>
     `;
   }
 
   function applyStickyColor(el, hex) {
-    el.style.background    = hexToRgba(hex, 0.12);
-    el.style.borderColor   = hexToRgba(hex, 0.45);
-    el.style.setProperty('--sticky-accent', hex);
+    const color = Sanitize.sanitizeColor(hex, '#fbbf24');
+    el.style.background    = hexToRgba(color, 0.12);
+    el.style.borderColor   = hexToRgba(color, 0.45);
+    el.style.setProperty('--sticky-accent', color);
   }
 
   function updateStickyElement(el, note) {
@@ -426,15 +427,6 @@ const NodeRenderer = (() => {
     nodes.filter(n => n.type === 'node').forEach(n => renderNode(n));
     // Sticky notes on top
     nodes.filter(n => n.type === 'sticky').forEach(n => renderNode(n));
-  }
-
-  /**
-   * Escape HTML entities
-   */
-  function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
   }
 
   return {

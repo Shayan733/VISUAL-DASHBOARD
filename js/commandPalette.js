@@ -159,7 +159,7 @@ const CommandPalette = (() => {
       .map(
         (type, i) => `
       <div class="cp-item ${i === activeIndex ? 'active' : ''}" data-index="${i}">
-        <div class="cp-item-icon" style="background:${type.color}22; border-color:${type.color}55; color:${type.color}">${type.icon}</div>
+        <div class="cp-item-icon" style="background:${Sanitize.sanitizeColor(type.color)}22; border-color:${Sanitize.sanitizeColor(type.color)}55; color:${Sanitize.sanitizeColor(type.color)}">${type.icon}</div>
         <div class="cp-item-info">
           <div class="cp-item-name">${type.label}</div>
           <div class="cp-item-desc">${type.description}</div>

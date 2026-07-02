@@ -32,10 +32,11 @@ const Properties = (() => {
 
     currentNodeId = nodeId;
 
-    const isCustomColor = !NODE_COLORS.some(c => c.value === node.color);
+    const nodeColor = Sanitize.sanitizeColor(node.color);
+    const isCustomColor = !NODE_COLORS.some(c => c.value === nodeColor);
 
     const colorSwatches = NODE_COLORS.map(c =>
-      `<div class="props-color-swatch ${c.value === node.color ? 'active' : ''}"
+      `<div class="props-color-swatch ${c.value === nodeColor ? 'active' : ''}"
             style="background:${c.value}" data-color="${c.value}"
             title="${c.name}"></div>`
     ).join('');
@@ -59,19 +60,19 @@ const Properties = (() => {
       <div class="props-body">
         <div class="props-field">
           <label>Label</label>
-          <input type="text" id="props-label" value="${escapeAttr(node.label)}" placeholder="Node label">
+          <input type="text" id="props-label" value="${escapeHtml(node.label)}" placeholder="Node label">
         </div>
         <div class="props-field">
           <label>Description</label>
-          <textarea id="props-description" placeholder="Add notes or description...">${escapeAttr(node.description || '')}</textarea>
+          <textarea id="props-description" placeholder="Add notes or description...">${escapeHtml(node.description || '')}</textarea>
         </div>
         <div class="props-field">
           <label>Color</label>
           <div class="props-color-grid" id="props-colors">
             ${colorSwatches}
             <label class="props-custom-swatch ${isCustomColor ? 'active' : ''}" title="Custom colour">
-              <span class="props-custom-swatch-preview" id="props-custom-preview" style="background:${node.color}"></span>
-              <input type="color" id="props-color-wheel" value="${node.color}">
+              <span class="props-custom-swatch-preview" id="props-custom-preview" style="background:${nodeColor}"></span>
+              <input type="color" id="props-color-wheel" value="${nodeColor}">
             </label>
           </div>
         </div>
@@ -81,11 +82,11 @@ const Properties = (() => {
         </div>
         <div class="props-field">
           <label>Owner</label>
-          <input type="text" id="props-owner" value="${escapeAttr(node.owner || '')}" placeholder="@username">
+          <input type="text" id="props-owner" value="${escapeHtml(node.owner || '')}" placeholder="@username">
         </div>
         <div class="props-field">
           <label>Due Date</label>
-          <input type="date" id="props-due-date" value="${node.dueDate || ''}">
+          <input type="date" id="props-due-date" value="${escapeHtml(node.dueDate || '')}">
         </div>
         ${Attachments.buildSectionHTML()}
         <button class="props-delete-btn" id="props-delete">Delete ${node.type === 'group' ? 'Group' : 'Node'}</button>
@@ -222,10 +223,6 @@ const Properties = (() => {
 
     // Prevent canvas interactions when using panel
     panelEl.addEventListener('mousedown', (e) => e.stopPropagation());
-  }
-
-  function escapeAttr(str) {
-    return str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   return { init, show, hide, get currentNodeId() { return currentNodeId; } };
