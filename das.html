@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Das Writer — Story Engine</title>
+  <meta name="description" content="Das Production story-writing engine — Claude is the brain, the database is the memory, Notion is the delivery shelf.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css?v=20260702-1">
+  <link rel="stylesheet" href="css/reset.css?v=20260702-1">
+  <link rel="stylesheet" href="css/module-tabs.css?v=20260702-1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+  <style>
+    body {
+      background: var(--canvas-bg, #0c0c14);
+      color: var(--text-primary, #ececf1);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    .das-page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 24px 64px;
+    }
+    .das-hero h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .das-hero p {
+      color: var(--text-secondary, #9a9ab0);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 58ch;
+    }
+    .das-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      background: var(--panel-bg, #0d0f16);
+      font-size: 12px;
+      color: var(--text-secondary, #9a9ab0);
+    }
+    .das-status .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #fbbf24;
+    }
+    .das-section { margin-top: 40px; }
+    .das-section h2 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted, #6b6b80);
+      margin-bottom: 14px;
+    }
+    .das-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .das-card {
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      background: var(--panel-bg, #0d0f16);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .das-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--accent, #a78bfa);
+    }
+    .das-card p {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text-secondary, #9a9ab0);
+    }
+    .das-steps { counter-reset: step; }
+    .das-steps li {
+      list-style: none;
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.06));
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-secondary, #9a9ab0);
+    }
+    .das-steps li::before {
+      counter-increment: step;
+      content: counter(step);
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: rgba(167, 139, 250, 0.15);
+      color: var(--accent, #a78bfa);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .das-steps li strong { color: var(--text-primary, #ececf1); }
+    code.inline {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+    pre.das-code {
+      background: var(--panel-bg, #0d0f16);
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text-secondary, #c0c0d0);
+      overflow-x: auto;
+    }
+    .das-footer {
+      margin-top: 48px;
+      font-size: 11px;
+      color: var(--text-muted, #6b6b80);
+    }
+  </style>
+</head>
+
+<body>
+  <nav id="module-tabs" aria-label="Modules">
+    <a class="module-tab" href="index.html">
+      <span class="tab-emoji">🧠</span> Canvas
+    </a>
+    <a class="module-tab active" href="das.html" aria-current="page">
+      <span class="tab-emoji">🎬</span> Das Writer
+    </a>
+  </nav>
+
+  <main class="das-page">
+    <div class="das-hero">
+      <h1>Das Writer — Story Engine</h1>
+      <p>
+        The story-writing engine for Das Production. Claude is the brain, this MCP
+        server is the door, the database is the memory. Every story step is saved and
+        versioned; a finished, audit-passed screenplay ships to Notion for the
+        Calcutta team.
+      </p>
+      <div class="das-status">
+        <span class="dot"></span>
+        Engine runs locally &nbsp;·&nbsp; connect it to Claude chat after the Cloudflare deploy
+      </div>
+    </div>
+
+    <section class="das-section">
+      <h2>The pipeline — one tool per step</h2>
+      <div class="das-grid">
+        <div class="das-card"><h3>create_project</h3><p>Start a story from a title + replication brief. Returns the project id.</p></div>
+        <div class="das-card"><h3>save_spine</h3><p>The 4 lines: want, stakes, hero belief, villain belief. Versioned, never overwritten.</p></div>
+        <div class="das-card"><h3>save_phases</h3><p>All 8 phase one-liners in one call.</p></div>
+        <div class="das-card"><h3>save_plants</h3><p>Plant/payoff table. A plant is an orphan until its payoff scene is set.</p></div>
+        <div class="das-card"><h3>save_scene_card</h3><p>Who / want / block / turn. An empty turn is refused — a scene that doesn't turn isn't a scene.</p></div>
+        <div class="das-card"><h3>save_scene_prose</h3><p>Prose attaches to a card as a new version and re-enters draft.</p></div>
+        <div class="das-card"><h3>approve_scene</h3><p>Founder-only flip from draft to approved. Refused without prose.</p></div>
+        <div class="das-card"><h3>get_project_state</h3><p>"Where were we?" — the session memory. Call it at the start of any new chat.</p></div>
+      </div>
+    </section>
+
+    <section class="das-section">
+      <h2>Run it locally</h2>
+      <pre class="das-code">cd das-story-engine
+npm install
+cp .env.example .env    # set DSE_BEARER_TOKEN
+npm run dev             # → http://localhost:8787/mcp</pre>
+    </section>
+
+    <section class="das-section">
+      <h2>How a story flows</h2>
+      <ol class="das-steps">
+        <li><strong>Brief in.</strong> You tell Claude "start a new story from this brief" — <code class="inline">create_project</code> makes the row.</li>
+        <li><strong>Spine locked.</strong> You iterate the 4 lines with Claude, then save with <code class="inline">approved: true</code>.</li>
+        <li><strong>Bones.</strong> 8 phases, then the plant/payoff table — orphan plants are tracked until paid.</li>
+        <li><strong>Scenes.</strong> Card first (must turn), prose second, founder approval third.</li>
+        <li><strong>Never lose the thread.</strong> Chat dies? New chat asks "where were we on Rooftop?" — <code class="inline">get_project_state</code> answers from the database.</li>
+        <li><strong>Next up (roadmap).</strong> Audit engine (plants paid, scenes turn, drafts cleared) → one-command ship to Notion.</li>
+      </ol>
+    </section>
+
+    <div class="das-footer">
+      © 2026 Das Production. All rights reserved. · Engine source: <code class="inline">das-story-engine/</code> · Runbook: <code class="inline">das-story-engine/docs/dev.md</code>
+    </div>
+  </main>
+</body>
+
+</html>

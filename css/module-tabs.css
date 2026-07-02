@@ -1,0 +1,54 @@
+/* ============================================
+   Module Tabs — one system, modules as tabs
+   (Canvas | Das Writer). Fixed strip, top center.
+   ============================================ */
+
+#module-tabs {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900; /* above canvas, below modals (10000) */
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--panel-bg, #0d0f16);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+#module-tabs .module-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary, #9a9ab0);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+#module-tabs .module-tab:hover {
+  color: var(--text-primary, #ececf1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+#module-tabs .module-tab.active {
+  color: var(--text-primary, #ececf1);
+  background: var(--accent, #a78bfa);
+  background: color-mix(in srgb, var(--accent, #a78bfa) 22%, transparent);
+}
+
+#module-tabs .module-tab .tab-emoji {
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Hide in read-only share view — viewers get the canvas only */
+body.read-only #module-tabs {
+  display: none;
+}
