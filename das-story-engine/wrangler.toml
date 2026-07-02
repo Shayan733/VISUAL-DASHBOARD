@@ -1,0 +1,9 @@
+# Cloudflare Workers config — deploy-later.
+# Secrets (never in this file):
+#   npx wrangler secret put DSE_BEARER_TOKEN
+#   npx wrangler secret put SUPABASE_URL
+#   npx wrangler secret put SUPABASE_SERVICE_KEY
+name = "das-story-engine"
+main = "src/server/worker.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
