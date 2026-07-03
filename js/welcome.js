@@ -18,7 +18,7 @@ const WelcomeModal = (() => {
 
   const loadTemplate = async (templateName) => {
     try {
-      const response = await fetch(`/templates/${templateName}-template.json`);
+      const response = await fetch(`/dashboard/templates/${templateName}-template.json`);
       if (!response.ok) {
         throw new Error(`Failed to load template: ${response.statusText}`);
       }

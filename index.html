@@ -14,21 +14,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=20260419-3">
-  <link rel="stylesheet" href="css/reset.css?v=20260419-3">
-  <link rel="stylesheet" href="css/canvas.css?v=20260419-3">
-  <link rel="stylesheet" href="css/toolbar.css?v=20260419-3">
-  <link rel="stylesheet" href="css/nodes.css?v=20260419-3">
-  <link rel="stylesheet" href="css/groups.css?v=20260419-3">
-  <link rel="stylesheet" href="css/connections.css?v=20260419-3">
-  <link rel="stylesheet" href="css/context-menu.css?v=20260419-3">
-  <link rel="stylesheet" href="css/properties.css?v=20260419-3">
-  <link rel="stylesheet" href="css/animations.css?v=20260419-3">
-  <link rel="stylesheet" href="css/minimap.css?v=20260419-3">
-  <link rel="stylesheet" href="css/commandPalette.css?v=20260419-3">
-  <link rel="stylesheet" href="css/welcome-modal.css?v=20260419-3">
-  <link rel="stylesheet" href="css/sidebar.css?v=20260419-3">
-  <link rel="stylesheet" href="css/attachments.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/variables.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/reset.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/canvas.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/toolbar.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/nodes.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/groups.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/connections.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/context-menu.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/properties.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/animations.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/minimap.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/commandPalette.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/welcome-modal.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/sidebar.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/attachments.css?v=20260419-3">
+  <link rel="stylesheet" href="/dashboard/css/tabs.css?v=20260419-3">
 
   <!-- Favicon -->
   <link rel="icon"
@@ -36,6 +37,12 @@
 </head>
 
 <body>
+  <!-- App switcher: TEDAR and this canvas run as separate services on one domain -->
+  <nav id="app-tabs" aria-label="App switcher">
+    <a class="app-tab" href="https://tedar.vercel.app/">TEDAR</a>
+    <span class="app-tab active" aria-current="page">Canvas</span>
+  </nav>
+
   <div id="app-shell">
     <!-- ═══════════ SIDEBAR ═══════════ -->
     <div id="sidebar" class="sidebar">
@@ -303,40 +310,40 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
   <!-- Config, Firebase auth, Firestore DB, sync -->
-  <script src="js/config.js?v=20260419-3"></script>
-  <script src="js/firebase-auth.js?v=20260419-3"></script>
-  <script src="js/firestore.js?v=20260419-3"></script>
-  <script src="js/firebase-storage.js?v=20260419-3"></script>
-  <script src="js/sync.js?v=20260419-3"></script>
+  <script src="/dashboard/js/config.js?v=20260419-3"></script>
+  <script src="/dashboard/js/firebase-auth.js?v=20260419-3"></script>
+  <script src="/dashboard/js/firestore.js?v=20260419-3"></script>
+  <script src="/dashboard/js/firebase-storage.js?v=20260419-3"></script>
+  <script src="/dashboard/js/sync.js?v=20260419-3"></script>
 
   <!-- Core utilities and state -->
-  <script src="js/utils.js?v=20260419-3"></script>
-  <script src="js/canvas.js?v=20260419-3"></script>
-  <script src="js/history.js?v=20260419-3"></script>
-  <script src="js/state.js?v=20260419-3"></script>
+  <script src="/dashboard/js/utils.js?v=20260419-3"></script>
+  <script src="/dashboard/js/canvas.js?v=20260419-3"></script>
+  <script src="/dashboard/js/history.js?v=20260419-3"></script>
+  <script src="/dashboard/js/state.js?v=20260419-3"></script>
 
   <!-- Canvas elements -->
-  <script src="js/node.js?v=20260419-3"></script>
-  <script src="js/selection.js?v=20260419-3"></script>
-  <script src="js/connection.js?v=20260419-3"></script>
-  <script src="js/drag.js?v=20260419-3"></script>
+  <script src="/dashboard/js/node.js?v=20260419-3"></script>
+  <script src="/dashboard/js/selection.js?v=20260419-3"></script>
+  <script src="/dashboard/js/connection.js?v=20260419-3"></script>
+  <script src="/dashboard/js/drag.js?v=20260419-3"></script>
 
   <!-- UI modules -->
-  <script src="js/toolbar.js?v=20260419-3"></script>
-  <script src="js/contextMenu.js?v=20260419-3"></script>
-  <script src="js/properties.js?v=20260419-3"></script>
-  <script src="js/keyboard.js?v=20260419-3"></script>
-  <script src="js/minimap.js?v=20260419-3"></script>
-  <script src="js/commandPalette.js?v=20260419-3"></script>
-  <script src="js/sidebar.js?v=20260419-3"></script>
-  <script src="js/attachments.js?v=20260419-3"></script>
+  <script src="/dashboard/js/toolbar.js?v=20260419-3"></script>
+  <script src="/dashboard/js/contextMenu.js?v=20260419-3"></script>
+  <script src="/dashboard/js/properties.js?v=20260419-3"></script>
+  <script src="/dashboard/js/keyboard.js?v=20260419-3"></script>
+  <script src="/dashboard/js/minimap.js?v=20260419-3"></script>
+  <script src="/dashboard/js/commandPalette.js?v=20260419-3"></script>
+  <script src="/dashboard/js/sidebar.js?v=20260419-3"></script>
+  <script src="/dashboard/js/attachments.js?v=20260419-3"></script>
 
   <!-- External libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <!-- Modals and app -->
-  <script src="js/welcome.js?v=20260419-3"></script>
-  <script src="js/app.js?v=20260419-3"></script>
+  <script src="/dashboard/js/welcome.js?v=20260419-3"></script>
+  <script src="/dashboard/js/app.js?v=20260419-3"></script>
 </body>
 
 </html>
